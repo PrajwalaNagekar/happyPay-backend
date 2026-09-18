@@ -1,0 +1,46 @@
+name: Deploy HappyPay Backend
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Deploy to EC2
+      - name: Deploy backend to EC2
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script_stop: true
+
+          script: |
+            echo "🚀 Starting HappyPay backend deployment..."
+
+            cd /home/ubuntu/happyPay-backend
+
+            echo "📥 Pulling latest code..."
+            git pull origin main
+
+            echo "📦 Installing dependencies..."
+            npm install --production=false
+
+            echo "🔄 Restarting PM2 backend..."
+            pm2 restart backend --update-env
+
+            echo "📊 PM2 status..."
+            pm2 status
+
+            echo "✅ Deployment completed successfully!"
