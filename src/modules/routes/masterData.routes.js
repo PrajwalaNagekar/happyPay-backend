@@ -1,7 +1,7 @@
 import express from "express";
 
 import PropertyType from "../models/propertyType.model.js";
-import ProofType from "../models/proofType.model.js";
+import ProofType from "../models/ProofType.model.js";
 import Category from "../models/catagory.model.js";
 import EducationalQualification from "../models/educationalQualification.model.js";
 
