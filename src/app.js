@@ -3,7 +3,7 @@ import express from "express";
 import corsMiddleware from "./middlewares/cors.middleware.js";
 import errorMiddleware from "./middlewares/error.middlware.js";
 import requestLogger from "./middlewares/requestLogger.middleare.js";
-import ApiError from "./utils/apiError.js";
+// import ApiError from "./utils/apiError.js";
 import otpRoutes from "./modules/routes/otp.routes.js";
 import emailOtpRoutes from "./modules/routes/emailOtp.routes.js";
 import masterDataRoutes from "./modules/routes/masterData.routes.js";
@@ -44,14 +44,14 @@ app.use("/api/v1/master-data", masterDataRoutes);
    404 Handler
 ============================== */
 
-app.use((req, res, next) => {
-  next(
-    ApiError.notFound(
-      `Cannot ${req.method} ${req.originalUrl}`
-    )
-  );
-});
-  
+// app.use((req, res, next) => {
+//   next(
+//     ApiError.notFound(
+//       `Cannot ${req.method} ${req.originalUrl}`
+//     )
+//   );
+// });
+
 /* ==============================
    Error Middleware
 ============================== */
