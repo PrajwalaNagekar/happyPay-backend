@@ -1,0 +1,685 @@
+{
+    "info": {
+      "_postman_id": "7c4e5f2a-9d1a-4c8e-b8e2-3a6f7d9c1e20",
+      "name": "HappyPay - Master Data APIs",
+      "description": "CRUD APIs for Property Type, Proof Type, Category and Educational Qualification with pagination, search, sorting and filtering.",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+      {
+        "key": "baseUrl",
+        "value": "http://localhost:5000/api/v1",
+        "type": "string"
+      },
+      {
+        "key": "propertyTypeId",
+        "value": "",
+        "type": "string"
+      },
+      {
+        "key": "proofTypeId",
+        "value": "",
+        "type": "string"
+      },
+      {
+        "key": "categoryId",
+        "value": "",
+        "type": "string"
+      },
+      {
+        "key": "educationalQualificationId",
+        "value": "",
+        "type": "string"
+      }
+    ],
+    "item": [
+      {
+        "name": "Property Types",
+        "item": [
+          {
+            "name": "Create Property Type",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Owned\",\n  \"description\": \"Owned property\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/master-data/property-types",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "property-types"
+                ]
+              }
+            }
+          },
+          {
+            "name": "Get Property Types",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/property-types",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "property-types"
+                ]
+              }
+            }
+          },
+          {
+            "name": "Get Property Types - Pagination",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/property-types?page=1&limit=10",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "property-types"
+                ],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Get Property Types - Search",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/property-types?search=owned",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "property-types"
+                ],
+                "query": [
+                  {
+                    "key": "search",
+                    "value": "owned"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Get Property Types - Sort",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/property-types?sortBy=name&sortOrder=asc",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "property-types"
+                ],
+                "query": [
+                  {
+                    "key": "sortBy",
+                    "value": "name"
+                  },
+                  {
+                    "key": "sortOrder",
+                    "value": "asc"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Get Property Types - Filter",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/property-types?isActive=true",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "property-types"
+                ],
+                "query": [
+                  {
+                    "key": "isActive",
+                    "value": "true"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Get Property Types - All Options",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/property-types?page=1&limit=10&search=owned&sortBy=name&sortOrder=asc&isActive=true",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "property-types"
+                ],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  },
+                  {
+                    "key": "search",
+                    "value": "owned"
+                  },
+                  {
+                    "key": "sortBy",
+                    "value": "name"
+                  },
+                  {
+                    "key": "sortOrder",
+                    "value": "asc"
+                  },
+                  {
+                    "key": "isActive",
+                    "value": "true"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Get Property Type By ID",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/property-types/{{propertyTypeId}}",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "property-types",
+                  "{{propertyTypeId}}"
+                ]
+              }
+            }
+          },
+          {
+            "name": "Update Property Type",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Rented\",\n  \"description\": \"Rented property\",\n  \"isActive\": true\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/master-data/property-types/{{propertyTypeId}}",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "property-types",
+                  "{{propertyTypeId}}"
+                ]
+              }
+            }
+          },
+          {
+            "name": "Delete Property Type",
+            "request": {
+              "method": "DELETE",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/property-types/{{propertyTypeId}}",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "property-types",
+                  "{{propertyTypeId}}"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Proof Types",
+        "item": [
+          {
+            "name": "Create Proof Type",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Aadhaar Card\",\n  \"code\": \"AADHAAR\",\n  \"description\": \"Aadhaar identity proof\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/master-data/proof-types",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "proof-types"
+                ]
+              }
+            }
+          },
+          {
+            "name": "Get Proof Types",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/proof-types?page=1&limit=10&search=&sortBy=createdAt&sortOrder=desc&isActive=true",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "proof-types"
+                ],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  },
+                  {
+                    "key": "search",
+                    "value": ""
+                  },
+                  {
+                    "key": "sortBy",
+                    "value": "createdAt"
+                  },
+                  {
+                    "key": "sortOrder",
+                    "value": "desc"
+                  },
+                  {
+                    "key": "isActive",
+                    "value": "true"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Get Proof Type By ID",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/proof-types/{{proofTypeId}}",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "proof-types",
+                  "{{proofTypeId}}"
+                ]
+              }
+            }
+          },
+          {
+            "name": "Update Proof Type",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"PAN Card\",\n  \"code\": \"PAN\",\n  \"description\": \"Permanent Account Number proof\",\n  \"isActive\": true\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/master-data/proof-types/{{proofTypeId}}",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "proof-types",
+                  "{{proofTypeId}}"
+                ]
+              }
+            }
+          },
+          {
+            "name": "Delete Proof Type",
+            "request": {
+              "method": "DELETE",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/proof-types/{{proofTypeId}}",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "proof-types",
+                  "{{proofTypeId}}"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Categories",
+        "item": [
+          {
+            "name": "Create Category",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"General\",\n  \"description\": \"General category\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/master-data/categories",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "categories"
+                ]
+              }
+            }
+          },
+          {
+            "name": "Get Categories",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/categories?page=1&limit=10&search=&sortBy=createdAt&sortOrder=desc&isActive=true",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "categories"
+                ],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  },
+                  {
+                    "key": "search",
+                    "value": ""
+                  },
+                  {
+                    "key": "sortBy",
+                    "value": "createdAt"
+                  },
+                  {
+                    "key": "sortOrder",
+                    "value": "desc"
+                  },
+                  {
+                    "key": "isActive",
+                    "value": "true"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Get Category By ID",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/categories/{{categoryId}}",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "categories",
+                  "{{categoryId}}"
+                ]
+              }
+            }
+          },
+          {
+            "name": "Update Category",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Retailer\",\n  \"description\": \"Retailer category\",\n  \"isActive\": true\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/master-data/categories/{{categoryId}}",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "categories",
+                  "{{categoryId}}"
+                ]
+              }
+            }
+          },
+          {
+            "name": "Delete Category",
+            "request": {
+              "method": "DELETE",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/categories/{{categoryId}}",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "categories",
+                  "{{categoryId}}"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Educational Qualifications",
+        "item": [
+          {
+            "name": "Create Educational Qualification",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Bachelor of Engineering\",\n  \"code\": \"BE\",\n  \"description\": \"Undergraduate engineering qualification\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/master-data/educational-qualifications",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "educational-qualifications"
+                ]
+              }
+            }
+          },
+          {
+            "name": "Get Educational Qualifications",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/educational-qualifications?page=1&limit=10&search=&sortBy=createdAt&sortOrder=desc&isActive=true",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "educational-qualifications"
+                ],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  },
+                  {
+                    "key": "search",
+                    "value": ""
+                  },
+                  {
+                    "key": "sortBy",
+                    "value": "createdAt"
+                  },
+                  {
+                    "key": "sortOrder",
+                    "value": "desc"
+                  },
+                  {
+                    "key": "isActive",
+                    "value": "true"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Get Educational Qualification By ID",
+            "request": {
+              "method": "GET",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/educational-qualifications/{{educationalQualificationId}}",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "educational-qualifications",
+                  "{{educationalQualificationId}}"
+                ]
+              }
+            }
+          },
+          {
+            "name": "Update Educational Qualification",
+            "request": {
+              "method": "PATCH",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Master of Computer Applications\",\n  \"code\": \"MCA\",\n  \"description\": \"Postgraduate computer application qualification\",\n  \"isActive\": true\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/master-data/educational-qualifications/{{educationalQualificationId}}",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "educational-qualifications",
+                  "{{educationalQualificationId}}"
+                ]
+              }
+            }
+          },
+          {
+            "name": "Delete Educational Qualification",
+            "request": {
+              "method": "DELETE",
+              "url": {
+                "raw": "{{baseUrl}}/master-data/educational-qualifications/{{educationalQualificationId}}",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "master-data",
+                  "educational-qualifications",
+                  "{{educationalQualificationId}}"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }

@@ -1,0 +1,86 @@
+{
+    "info": {
+      "_postman_id": "d7e6f5a4-b3c2-4d1e-9f8a-7b6c5d4e3f21",
+      "name": "HappyPay - Email OTP APIs",
+      "description": "HappyPay Email OTP Send and Verify APIs",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+      {
+        "key": "baseUrl",
+        "value": "http://localhost:5000/api/v1",
+        "type": "string"
+      },
+      {
+        "key": "email",
+        "value": "test@gmail.com",
+        "type": "string"
+      },
+      {
+        "key": "otp",
+        "value": "123456",
+        "type": "string"
+      }
+    ],
+    "item": [
+      {
+        "name": "Email OTP",
+        "item": [
+          {
+            "name": "Send Email OTP",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"email\": \"{{email}}\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/email-otp/send",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "email-otp",
+                  "send"
+                ]
+              }
+            },
+            "response": []
+          },
+          {
+            "name": "Verify Email OTP",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"email\": \"{{email}}\",\n  \"otp\": \"{{otp}}\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/email-otp/verify",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "email-otp",
+                  "verify"
+                ]
+              }
+            },
+            "response": []
+          }
+        ]
+      }
+    ]
+  }
