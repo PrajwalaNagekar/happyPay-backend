@@ -19,8 +19,7 @@ const create = (Model) => async (req, res, next) => {
     return res
       .status(201)
       .json(
-        new ApiResponse(
-          201,
+        ApiResponse.success(
           data,
           "Created successfully"
         )
@@ -38,13 +37,15 @@ const getAll = (Model) => async (req, res, next) => {
       req.query
     );
 
+    console.log("result-----------", result);
+
     return res
       .status(200)
       .json(
-        new ApiResponse(
-          200,
-          result,
-          "Data fetched successfully"
+        ApiResponse.success(
+          result.data,
+          "Data fetched successfully",
+          result.meta
         )
       );
   } catch (error) {
@@ -63,8 +64,7 @@ const getById = (Model) => async (req, res, next) => {
     return res
       .status(200)
       .json(
-        new ApiResponse(
-          200,
+        ApiResponse.success(
           data,
           "Data fetched successfully"
         )
@@ -86,8 +86,7 @@ const update = (Model) => async (req, res, next) => {
     return res
       .status(200)
       .json(
-        new ApiResponse(
-          200,
+        ApiResponse.success(
           data,
           "Updated successfully"
         )
@@ -108,8 +107,7 @@ const remove = (Model) => async (req, res, next) => {
     return res
       .status(200)
       .json(
-        new ApiResponse(
-          200,
+        ApiResponse.success(
           data,
           "Deleted successfully"
         )

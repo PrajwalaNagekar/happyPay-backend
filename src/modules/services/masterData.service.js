@@ -9,12 +9,13 @@ import {
   deleteById,
 } from "../repositories/masterData.repository.js";
 
+
+/* ==============================
+   Create Master Data
+============================== */
+
 const createMasterData = async (Model, payload) => {
-  const {
-    name,
-    code,
-    description,
-  } = payload;
+  const { name, code, description } = payload;
 
   if (!name || !name.trim()) {
     throw ApiError.badRequest("Name is required");
@@ -28,14 +29,22 @@ const createMasterData = async (Model, payload) => {
 
   return await create(Model, {
     name: name.trim(),
+
     ...(code && {
       code: code.trim(),
     }),
+
     ...(description && {
       description: description.trim(),
     }),
   });
 };
+
+
+/* ==============================
+   Get All Master Data
+============================== */
+
 const getAllMasterData = async (Model, query) => {
   let {
     page = 1,
@@ -46,15 +55,19 @@ const getAllMasterData = async (Model, query) => {
     isActive,
   } = query;
 
+
+  /* ==============================
+     Pagination Validation
+  ============================== */
+
   page = Number(page);
   limit = Number(limit);
 
-  // Prevent invalid pagination values
-  if (page < 1) {
+  if (page < 1 || Number.isNaN(page)) {
     page = 1;
   }
 
-  if (limit < 1) {
+  if (limit < 1 || Number.isNaN(limit)) {
     limit = 10;
   }
 
@@ -63,7 +76,11 @@ const getAllMasterData = async (Model, query) => {
     limit = 100;
   }
 
-  // Convert filter
+
+  /* ==============================
+     Active Status Filter
+  ============================== */
+
   if (isActive !== undefined) {
     if (isActive === "true") {
       isActive = true;
@@ -76,6 +93,35 @@ const getAllMasterData = async (Model, query) => {
     }
   }
 
+
+  /* ==============================
+     Sort Validation
+  ============================== */
+
+  const allowedSortFields = [
+    "name",
+    "code",
+    "createdAt",
+    "updatedAt",
+  ];
+
+  if (!allowedSortFields.includes(sortBy)) {
+    throw ApiError.badRequest(
+      `Invalid sort field. Allowed fields: ${allowedSortFields.join(", ")}`
+    );
+  }
+
+  if (!["asc", "desc"].includes(sortOrder)) {
+    throw ApiError.badRequest(
+      "sortOrder must be asc or desc"
+    );
+  }
+
+
+  /* ==============================
+     Fetch Data
+  ============================== */
+
   const result = await findAll(Model, {
     page,
     limit,
@@ -85,23 +131,41 @@ const getAllMasterData = async (Model, query) => {
     isActive,
   });
 
+
+  /* ==============================
+     Pagination
+  ============================== */
+
   const totalPages = Math.ceil(
     result.total / limit
   );
 
+
+  /* ==============================
+     Response
+  ============================== */
+
   return {
     data: result.data,
 
-    pagination: {
-      total: result.total,
-      totalPages,
-      currentPage: page,
-      limit,
-      hasNextPage: page < totalPages,
-      hasPreviousPage: page > 1,
+    meta: {
+      pagination: {
+        total: result.total,
+        totalPages,
+        currentPage: page,
+        limit,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
     },
   };
 };
+
+
+/* ==============================
+   Get Master Data By ID
+============================== */
+
 const getMasterDataById = async (Model, id) => {
   const data = await findById(Model, id);
 
@@ -111,6 +175,11 @@ const getMasterDataById = async (Model, id) => {
 
   return data;
 };
+
+
+/* ==============================
+   Update Master Data
+============================== */
 
 const updateMasterData = async (
   Model,
@@ -126,6 +195,11 @@ const updateMasterData = async (
 
   const updateData = {};
 
+
+  /* ==============================
+     Name
+  ============================== */
+
   if (name !== undefined) {
     if (!name.trim()) {
       throw ApiError.badRequest(
@@ -136,18 +210,44 @@ const updateMasterData = async (
     updateData.name = name.trim();
   }
 
+
+  /* ==============================
+     Code
+  ============================== */
+
   if (code !== undefined) {
     updateData.code = code.trim();
   }
+
+
+  /* ==============================
+     Description
+  ============================== */
 
   if (description !== undefined) {
     updateData.description =
       description.trim();
   }
 
+
+  /* ==============================
+     Active Status
+  ============================== */
+
   if (isActive !== undefined) {
+    if (typeof isActive !== "boolean") {
+      throw ApiError.badRequest(
+        "isActive must be a boolean"
+      );
+    }
+
     updateData.isActive = isActive;
   }
+
+
+  /* ==============================
+     Update
+  ============================== */
 
   const data = await updateById(
     Model,
@@ -162,8 +262,19 @@ const updateMasterData = async (
   return data;
 };
 
-const deleteMasterData = async (Model, id) => {
-  const data = await deleteById(Model, id);
+
+/* ==============================
+   Delete Master Data
+============================== */
+
+const deleteMasterData = async (
+  Model,
+  id
+) => {
+  const data = await deleteById(
+    Model,
+    id
+  );
 
   if (!data) {
     throw ApiError.notFound("Data not found");
@@ -171,6 +282,8 @@ const deleteMasterData = async (Model, id) => {
 
   return data;
 };
+
+
 export {
   createMasterData,
   getAllMasterData,

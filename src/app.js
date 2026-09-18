@@ -38,7 +38,7 @@ app.get("/", (req, res) => {
 ============================== */
 
 app.use("/api/v1/otp", otpRoutes);
-app.use("/api/v1/email-otp", emailOtpRoutes);
+app.use("/api/v1/email-otp", emailOtpRoutes);   
 app.use("/api/v1/master-data", masterDataRoutes);
 /* ==============================
    404 Handler
