@@ -1,5 +1,5 @@
-import ApiError from "../../utils/apiError.js";
-import transporter from "../../config/mail.js";
+import transporter from "../../config/mail.js"
+;
 
 import {
   findLatestOtp,
@@ -11,9 +11,9 @@ import {
 
 const sendEmailOtp = async (email) => {
   if (!email) {
-    throw ApiError.badRequest(
-      "Email is required"
-    );
+    const error = new Error("Email is required");
+    error.statusCode = 400;
+    throw error;
   }
 
   email = email.trim().toLowerCase();
@@ -69,14 +69,15 @@ const sendEmailOtp = async (email) => {
 };
 
 
-const verifyEmailOtp = async (
-  email,
-  otp
-) => {
+const verifyEmailOtp = async (email, otp) => {
   if (!email || !otp) {
-    throw ApiError.badRequest(
+    const error = new Error(
       "Email and OTP are required"
     );
+
+    error.statusCode = 400;
+
+    throw error;
   }
 
   email = email.trim().toLowerCase();
@@ -85,21 +86,33 @@ const verifyEmailOtp = async (
   const otpRecord = await findLatestOtp(email);
 
   if (!otpRecord) {
-    throw ApiError.badRequest(
+    const error = new Error(
       "OTP not found or already verified"
     );
+
+    error.statusCode = 400;
+
+    throw error;
   }
 
   if (new Date() > otpRecord.expiresAt) {
-    throw ApiError.badRequest(
+    const error = new Error(
       "OTP has expired"
     );
+
+    error.statusCode = 400;
+
+    throw error;
   }
 
   if (otpRecord.otp !== otp) {
-    throw ApiError.badRequest(
+    const error = new Error(
       "Invalid OTP"
     );
+
+    error.statusCode = 400;
+
+    throw error;
   }
 
   const verifiedOtp =
