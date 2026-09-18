@@ -32,7 +32,15 @@ jobs:
             cd /home/ubuntu/happyPay-backend
 
             echo "📥 Pulling latest code..."
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "🔐 Creating production .env..."
+            cat > .env << 'EOF'
+            ${{ secrets.ENV_FILE }}
+            EOF
+
+            chmod 600 .env
 
             echo "📦 Installing dependencies..."
             npm install --production=false
@@ -42,5 +50,8 @@ jobs:
 
             echo "📊 PM2 status..."
             pm2 status
+
+            echo "📋 Checking backend logs..."
+            pm2 logs backend --lines 20 --nostream
 
             echo "✅ Deployment completed successfully!"
