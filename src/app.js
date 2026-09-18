@@ -6,6 +6,7 @@ import requestLogger from "./middlewares/requestLogger.middleare.js";
 import ApiError from "./utils/apiError.js";
 import otpRoutes from "./modules/routes/otp.routes.js";
 import emailOtpRoutes from "./modules/routes/emailOtp.routes.js";
+import masterDataRoutes from "./modules/routes/masterData.routes.js";
 const app = express();
 
 /* ==============================
@@ -38,6 +39,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/otp", otpRoutes);
 app.use("/api/v1/email-otp", emailOtpRoutes);
+app.use("/api/v1/master-data", masterDataRoutes);
 /* ==============================
    404 Handler
 ============================== */
@@ -49,7 +51,7 @@ app.use((req, res, next) => {
     )
   );
 });
-
+  
 /* ==============================
    Error Middleware
 ============================== */
