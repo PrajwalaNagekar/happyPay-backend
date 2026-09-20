@@ -6,7 +6,7 @@ import {
   deleteMasterData,
 } from "../services/masterData.service.js";
 
-import ApiResponse from "../../utils/ApiResponse.js";
+import ApiResponse from "../../../utils/ApiResponse.js";
 
 
 const create = (Model) => async (req, res, next) => {

@@ -1,9 +1,9 @@
 import express from "express";
 
-import PropertyType from "../models/propertyType.model.js";
-import ProofType from "../models/proofType.model.js";
-import Category from "../models/catagory.model.js";
-import EducationalQualification from "../models/EducationalQualification.model.js";
+import PropertyType from "../model/propertyType.model.js";
+import ProofType from "../model/ProofType.model.js";
+import Category from "../model/catagory.model.js";
+import EducationalQualification from "../model/EducationalQualification.model.js";
 
 import {
   create,

@@ -1,4 +1,4 @@
-import transporter from "../../config/mail.js"
+import transporter from "../../../config/mail.js"
 ;
 
 import {
@@ -6,7 +6,7 @@ import {
   deleteExistingOtps,
   createOtp,
   markOtpVerified,
-} from "../repositories/emailOtp.repository.js";
+} from "../repository/emailOtp.repository.js";
 
 
 const sendEmailOtp = async (email) => {

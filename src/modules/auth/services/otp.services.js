@@ -4,13 +4,13 @@ import {
     markOtpVerified,
     incrementAttempts,
     deletePreviousOtps,
-  } from "../repositories/otp.repository.js";
+  } from "../repository/otp.repository.js";
   
   import {
     findByMobile,
     createUser,
     verifyMobile,
-  } from "../repositories/user.repository.js";
+  } from "../repository/user.repository.js";
   
   const generateOtp = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();

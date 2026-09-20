@@ -1,4 +1,4 @@
-import EmailOtp from "../models/EmailOtp.model.js";
+import EmailOtp from "../model/EmailOtp.model.js";
 
 
 const findLatestOtp = async (email) => {

@@ -1,4 +1,4 @@
-import ApiError from "../../utils/apiError.js";
+import ApiError from "../../../utils/apiError.js";
 
 import {
   findByName,
@@ -7,7 +7,7 @@ import {
   findById,
   updateById,
   deleteById,
-} from "../repositories/masterData.repository.js";
+} from "../repository/masterData.repository.js";
 
 
 /* ==============================

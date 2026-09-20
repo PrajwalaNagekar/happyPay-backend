@@ -1,4 +1,4 @@
-import Otp from "../models/otp.model.js";
+import Otp from "../model/otp.model.js";
 
 const createOtp = async (mobile, otp, expiresAt) => {
   const testOtp = process.env.NODE_ENV === "development"

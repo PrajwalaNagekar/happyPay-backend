@@ -3,7 +3,7 @@ import {
   verifyEmailOtp,
 } from "../services/emailOtp.service.js";
 
-import { ApiResponse } from "../../utils/ApiResponse.js";
+import { ApiResponse } from "../../../utils/ApiResponse.js";
 
 const sendOtp = async (req, res) => {
   try {
