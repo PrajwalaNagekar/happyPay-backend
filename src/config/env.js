@@ -5,8 +5,10 @@ const env = {
     PORT: process.env.PORT || 7000,
     MONGO_URI: process.env.MONGO_URI,
     CORS_ORIGINS: process.env.CORS_ORIGINS,
-    ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
-    ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN || "1h",
+    JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
+    JWT_ACCESS_EXPIRES_IN: process.env.JWT_ACCESS_EXPIRES_IN || "15m",
+    JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || "1h",
+    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
     SMTP_HOST: process.env.SMTP_HOST,
     SMTP_PORT: process.env.SMTP_PORT,
     SMTP_USER: process.env.SMTP_USER,
@@ -16,8 +18,9 @@ const env = {
     REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN || "7d",
     ADMIN_NAME: process.env.ADMIN_NAME,
     ADMIN_EMAIL: process.env.ADMIN_EMAIL,
-    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
-
+    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD, 
+    PROVIDER_BASE_URL: process.env.PROVIDER_BASE_URL,
+    PROVIDER_API_KEY: process.env.PROVIDER_API_KEY,
 }
 
 export default env;
