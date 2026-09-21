@@ -1,23 +1,36 @@
 import FormData from "form-data";
 import providerClient from "../../../config/provider.client.js";
 
-const verifyAccount = async ({
-  accountNumber,
-  bankIfsc,
+const verifyAadhar = async ({
+  aadhaarNumber,
   latitude,
   longitude,
   txnid,
 }) => {
   const form = new FormData();
 
-  form.append("accountNumber", accountNumber);
-  form.append("bankIfsc", bankIfsc);
-  form.append("latitude", latitude);
-  form.append("longitude", longitude);
-  form.append("txnid", txnid);
+  form.append(
+    "aadhaarNumber",
+    aadhaarNumber
+  );
+
+  form.append(
+    "latitude",
+    latitude
+  );
+
+  form.append(
+    "longitude",
+    longitude
+  );
+
+  form.append(
+    "txnid",
+    txnid
+  );
 
   const response = await providerClient.post(
-    "api/public/demographic/AccVerify",
+    "api/public/demographic/verifyAadhar",
     form,
     {
       headers: {
@@ -30,5 +43,5 @@ const verifyAccount = async ({
 };
 
 export {
-  verifyAccount,
+  verifyAadhar,
 };
