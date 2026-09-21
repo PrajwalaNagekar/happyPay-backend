@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
   res.json({
     requestId: req.id,
     success: true,
-    message: "Happy pay API is running",
+    message: "Happy pay API is runnning",
   });
 });
 
