@@ -65,6 +65,83 @@ const verifyAadharController = async (
   }
 };
 
+
+
+const verifyPanController = async (req, res) => {
+  try {
+    const {
+      pan,
+      latitude,
+      longitude,
+      txnid,
+      nameOnCard,
+      dateOfBirth,
+    } = req.body;
+
+    const result = await verifyPan({
+      pan,
+      latitude,
+      longitude,
+      txnid,
+      nameOnCard,
+      dateOfBirth,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "PAN verification successful",
+      data: result,
+    });
+  } catch (error) {
+    console.log("PAN verification error:", error.message);
+    console.log("Provider response:", error.response?.data);
+
+    return res.status(error.response?.status || 500).json({
+      success: false,
+      message: "PAN verification failed",
+      error: error.response?.data || error.message,
+    });
+  }
+};
+
+const verifyAccountController = async (req, res) => {
+  try {
+    const {
+      accountNumber,
+      bankIfsc,
+      latitude,
+      longitude,
+      txnid,
+    } = req.body;
+
+    const result = await verifyAccount({
+      accountNumber,
+      bankIfsc,
+      latitude,
+      longitude,
+      txnid,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Account verification successful",
+      data: result,
+    });
+  } catch (error) {
+    console.log("Account verification error:", error.message);
+    console.log("Provider response:", error.response?.data);
+
+    return res.status(error.response?.status || 500).json({
+      success: false,
+      message: "Account verification failed",
+      error: error.response?.data || error.message,
+    });
+  }
+};
+
+
 export {
   verifyAadharController,
+  verifyPanController,
+  verifyAccountController,
 };
