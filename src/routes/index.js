@@ -12,4 +12,6 @@ router.use("/api/v1/email-otp", emailOtpRoutes);
 router.use("/api/v1/master-data", masterDataRoutes);
 router.use("/api/v1/provider/demographic",demographicRoutes);
 router.use("/api/v1/auth", authRoutes);
+
+
 export default router;
