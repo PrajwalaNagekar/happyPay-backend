@@ -1,4 +1,4 @@
-```yaml
+
 name: Deploy HappyPay Backend
 
 on:
@@ -162,4 +162,3 @@ jobs:
 
             echo "✅ Backend API is responding."
             echo "✅ HappyPay backend deployment completed successfully!"
-```
