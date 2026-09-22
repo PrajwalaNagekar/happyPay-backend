@@ -256,13 +256,13 @@ const userSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: [
-        "pending",
+     
         "active",
-        "rejected",
+   
         "suspended",
         "blocked",
       ],
-      default: "pending",
+      default: "active",
     },
 
     isActive: {

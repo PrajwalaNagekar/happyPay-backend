@@ -1,7 +1,9 @@
+import http from "http";
 import app from "./app.js";
 import connectDB from "./config/db.js";
 import env from "./config/env.js";
 import logger from "./utils/logger.js";
+import { initializeSocket } from "./sockets/socket.server.js";
 
 let server;
 
@@ -24,7 +26,14 @@ const startServer = async () => {
 
     const PORT = env.PORT;
 
-    server = app.listen(PORT, () => {
+    // Create HTTP server using Express app
+    const httpServer = http.createServer(app);
+
+    // Initialize Socket.IO
+    initializeSocket(httpServer);
+
+    // Start HTTP + Socket.IO server
+    server = httpServer.listen(PORT, () => {
       logger.info(`Server is running on port ${PORT}`);
     });
   } catch (error) {
