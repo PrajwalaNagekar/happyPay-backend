@@ -1,3 +1,4 @@
+```yaml
 name: Deploy HappyPay Backend
 
 on:
@@ -13,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       # 1. Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,38 +22,144 @@ jobs:
       # 2. Deploy to EC2
       - name: Deploy backend to EC2
         uses: appleboy/ssh-action@v1.2.2
+
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
+          port: 22
+          command_timeout: 10m
           script_stop: true
 
           script: |
+            set -e
+
             echo "🚀 Starting HappyPay backend deployment..."
 
             cd /home/ubuntu/happyPay-backend
 
+            # ---------------------------------------
+            # Pull latest code
+            # ---------------------------------------
             echo "📥 Pulling latest code..."
+
             git fetch origin main
             git reset --hard origin/main
 
+            # ---------------------------------------
+            # Create production .env
+            # ---------------------------------------
             echo "🔐 Creating production .env..."
+
             cat > .env << 'EOF'
             ${{ secrets.ENV_FILE }}
             EOF
 
             chmod 600 .env
 
+            # ---------------------------------------
+            # Install dependencies
+            # ---------------------------------------
             echo "📦 Installing dependencies..."
+
             npm install --production=false
 
+            # ---------------------------------------
+            # Clear OLD PM2 logs
+            # ---------------------------------------
+            echo "🧹 Clearing old PM2 logs..."
+
+            pm2 flush
+
+            # ---------------------------------------
+            # Restart backend
+            # ---------------------------------------
             echo "🔄 Restarting PM2 backend..."
+
             pm2 restart backend --update-env
 
-            echo "📊 PM2 status..."
-            pm2 status
+            pm2 save
 
-            echo "📋 Checking backend logs..."
-            pm2 logs backend --lines 20 --nostream
+            # ---------------------------------------
+            # Wait for application
+            # ---------------------------------------
+            echo "⏳ Waiting for backend to start..."
 
-            echo "✅ Deployment completed successfully!"
+            sleep 10
+
+            # ---------------------------------------
+            # Check PM2 status
+            # ---------------------------------------
+            echo "📊 Checking PM2 status..."
+
+            STATUS=$(pm2 jlist | node -e "
+              let d='';
+              process.stdin.on('data', c => d += c);
+              process.stdin.on('end', () => {
+                const apps = JSON.parse(d);
+                const app = apps.find(x => x.name === 'backend');
+                console.log(app ? app.pm2_env.status : 'missing');
+              });
+            ")
+
+            echo "PM2 status: $STATUS"
+
+            if [ "$STATUS" != "online" ]; then
+              echo "❌ Backend is not online."
+
+              echo "----- PM2 STATUS -----"
+              pm2 status
+
+              echo "----- BACKEND LOGS -----"
+              pm2 logs backend --lines 100 --nostream
+
+              exit 1
+            fi
+
+            # ---------------------------------------
+            # Check application error log
+            # ---------------------------------------
+            echo "🔍 Checking application errors..."
+
+            ERROR_LOG="$HOME/.pm2/logs/backend-error.log"
+
+            if [ -s "$ERROR_LOG" ]; then
+
+              echo "❌ Backend generated errors!"
+
+              echo "----- ERROR LOG -----"
+              cat "$ERROR_LOG"
+
+              echo "----- PM2 STATUS -----"
+              pm2 status
+
+              exit 1
+            fi
+
+            # ---------------------------------------
+            # Check backend API
+            # ---------------------------------------
+            echo "🌐 Checking backend API..."
+
+            if ! curl \
+              --fail \
+              --silent \
+              --show-error \
+              --max-time 10 \
+              http://127.0.0.1:5000/ > /dev/null
+            then
+
+              echo "❌ Backend API is not responding!"
+
+              echo "----- PM2 STATUS -----"
+              pm2 status
+
+              echo "----- BACKEND LOGS -----"
+              pm2 logs backend --lines 100 --nostream
+
+              exit 1
+            fi
+
+            echo "✅ Backend API is responding."
+            echo "✅ HappyPay backend deployment completed successfully!"
+```
