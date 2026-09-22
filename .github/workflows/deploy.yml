@@ -64,7 +64,7 @@ jobs:
             # ---------------------------------------
             echo "📦 Installing dependencies..."
 
-            npm install --production=false
+            npm install --production=false --legacy-peer-deps
 
             # ---------------------------------------
             # Clear old PM2 logs
