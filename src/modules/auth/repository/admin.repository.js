@@ -14,8 +14,12 @@ const findById = async (id) => {
   return await Admin.findById(id);
 };
 
+const findOne = async (query) => {
+  return await Admin.findOne(query);
+};
 export {
   findByEmail,
-  createAdmin,
+  createAdmin,  
   findById,
+  findOne,
 };

@@ -38,6 +38,15 @@ const supportTicketSchema = new mongoose.Schema(
       required: true,
     },
 
+    otherCategory: {
+      type: String,
+      trim: true,
+      default: null,
+      required: function () {
+        return this.category === "OTHER";
+      },
+    },
+
     priority: {
       type: String,
       enum: ["low", "medium", "high", "urgent"],
@@ -49,6 +58,30 @@ const supportTicketSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+
+    attachments: [
+      {
+        url: {
+          type: String,
+          trim: true,
+        },
+    
+        fileName: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+    
+        fileType: {
+          type: String,
+          trim: true,
+        },
+    
+        fileSize: {
+          type: Number,
+        },
+      },
+    ],
 
     status: {
       type: String,

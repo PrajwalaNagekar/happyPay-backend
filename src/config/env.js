@@ -6,7 +6,7 @@ const env = {
     MONGO_URI: process.env.MONGO_URI,
     CORS_ORIGINS: process.env.CORS_ORIGINS,
     JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
-    JWT_ACCESS_EXPIRES_IN: process.env.JWT_ACCESS_EXPIRES_IN || "15m",
+    JWT_ACCESS_EXPIRES_IN: process.env.JWT_ACCESS_EXPIRES_IN || "10h",
     JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || "1h",
     JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
     SMTP_HOST: process.env.SMTP_HOST,
@@ -21,6 +21,9 @@ const env = {
     ADMIN_PASSWORD: process.env.ADMIN_PASSWORD, 
     PROVIDER_BASE_URL: process.env.PROVIDER_BASE_URL,
     PROVIDER_API_KEY: process.env.PROVIDER_API_KEY,
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
 }
 
 export default env;
