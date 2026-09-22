@@ -19,7 +19,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Deploy to EC2
+      # 2. Deploy backend to EC2
       - name: Deploy backend to EC2
         uses: appleboy/ssh-action@v1.2.2
 
@@ -29,7 +29,6 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: 22
           command_timeout: 10m
-          script_stop: true
 
           script: |
             set -e
@@ -51,10 +50,13 @@ jobs:
             # ---------------------------------------
             echo "🔐 Creating production .env..."
 
-            cat > .env << 'EOF'
+            sudo rm -f .env
+
+            sudo bash -c 'cat > /home/ubuntu/happyPay-backend/.env' <<'EOF'
             ${{ secrets.ENV_FILE }}
             EOF
 
+            sudo chown ubuntu:ubuntu .env
             chmod 600 .env
 
             # ---------------------------------------
@@ -65,7 +67,7 @@ jobs:
             npm install --production=false
 
             # ---------------------------------------
-            # Clear OLD PM2 logs
+            # Clear old PM2 logs
             # ---------------------------------------
             echo "🧹 Clearing old PM2 logs..."
 
@@ -76,7 +78,11 @@ jobs:
             # ---------------------------------------
             echo "🔄 Restarting PM2 backend..."
 
-            pm2 restart backend --update-env
+            if pm2 describe backend >/dev/null 2>&1; then
+              pm2 restart backend --update-env
+            else
+              pm2 start src/server.js --name backend
+            fi
 
             pm2 save
 
@@ -105,6 +111,7 @@ jobs:
             echo "PM2 status: $STATUS"
 
             if [ "$STATUS" != "online" ]; then
+
               echo "❌ Backend is not online."
 
               echo "----- PM2 STATUS -----"
@@ -162,3 +169,4 @@ jobs:
 
             echo "✅ Backend API is responding."
             echo "✅ HappyPay backend deployment completed successfully!"
+
