@@ -1,4 +1,5 @@
-import { createAdminService } from "../services/admin.services.js";
+import { createAdminService, loginAdminService } from "../services/admin.services.js";
+import ApiResponse from "../../../utils/ApiResponse.js";
 
 const createAdminController = async (req, res) => {
   try {
@@ -27,4 +28,24 @@ const createAdminController = async (req, res) => {
   }
 };
 
-export { createAdminController };
+const loginAdmin = async (req, res) => {
+  try {
+    const { email, mobile, password } = req.body;
+
+    const data = await loginAdminService({
+      email,
+      mobile,
+      password,
+    });
+
+    return res
+      .status(200)
+      .json(ApiResponse.success(data, "Login successful"));
+  } catch (error) {
+    return res
+      .status(error.statusCode || 500)
+      .json(ApiResponse.error(error.message || "Login failed"));
+  }
+};
+
+export { createAdminController, loginAdmin };

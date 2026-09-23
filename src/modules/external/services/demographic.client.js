@@ -101,10 +101,16 @@ const verifyAccount = async ({
   return response.data;
 };
 
-
+  const getBankList = async () => {
+    const response = await providerClient.get(
+      "api/public/aeps5/bank5/banks"
+    );
+    return response.data;
+  };
 
 export {
   verifyAadhar,
   verifyPan,
   verifyAccount,
+  getBankList,
 };

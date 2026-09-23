@@ -1,4 +1,5 @@
 import {
+  getBankList,
   verifyAadhar,
 } from "../services/demographic.client.js";
 
@@ -140,8 +141,29 @@ const verifyAccountController = async (req, res) => {
 };
 
 
+const getBankListController = async (req, res) => {
+  try {
+    const result = await getBankList();
+    return res.status(200).json({
+      success: true,
+      message: "Bank list fetched successfully",
+      data: result,
+    });
+  }
+  catch (error) {
+    console.log("Bank list fetching error:", error.message);
+    console.log("Provider response:", error.response?.data);
+    return res.status(error.response?.status || 500).json({
+      success: false,
+      message: "Bank list fetching failed",
+      error: error.response?.data || error.message,
+    });
+  }
+};
+
 export {
   verifyAadharController,
   verifyPanController,
   verifyAccountController,
+  getBankListController,
 };

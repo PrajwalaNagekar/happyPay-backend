@@ -1,6 +1,7 @@
 import express from "express";
 
 import {
+  getBankListController,
   verifyAadharController,
   verifyAccountController,
   verifyPanController,
@@ -14,5 +15,6 @@ router.post(
 );
 router.post("/verify-pan", verifyPanController);
 router.post("/verify-account", verifyAccountController);
+router.get("/get-bank-list", getBankListController);
 
 export default router;

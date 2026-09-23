@@ -6,6 +6,22 @@ const findByEmail = async (email) => {
   }).select("+password");
 };
 
+const findAdminForLogin = async ({ email, mobile }) => {
+  if (email?.trim()) {
+    return await Admin.findOne({
+      email: email.toLowerCase().trim(),
+    }).select("+password");
+  }
+
+  if (mobile?.trim()) {
+    return await Admin.findOne({
+      mobile: mobile.trim(),
+    }).select("+password");
+  }
+
+  return null;
+};
+
 const createAdmin = async (data) => {
   return await Admin.create(data);
 };
@@ -19,7 +35,8 @@ const findOne = async (query) => {
 };
 export {
   findByEmail,
-  createAdmin,  
+  findAdminForLogin,
+  createAdmin,
   findById,
   findOne,
 };
