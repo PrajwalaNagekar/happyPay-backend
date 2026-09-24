@@ -8,6 +8,13 @@ import {
   markOtpVerified,
 } from "../repository/emailOtp.repository.js";
 
+import {
+  findByMobile,
+  findByEmail,
+  setEmailVerified,
+  markEmailVerifiedByEmail,
+} from "../repository/user.repository.js";
+
 
 const sendEmailOtp = async (email) => {
   if (!email) {
@@ -69,7 +76,7 @@ const sendEmailOtp = async (email) => {
 };
 
 
-const verifyEmailOtp = async (email, otp) => {
+const verifyEmailOtp = async (email, otp, mobile) => {
   if (!email || !otp) {
     const error = new Error(
       "Email and OTP are required"
@@ -115,12 +122,47 @@ const verifyEmailOtp = async (email, otp) => {
     throw error;
   }
 
+  let user = null;
+
+  if (mobile) {
+    const normalizedMobile = String(mobile).trim();
+    user = await findByMobile(normalizedMobile);
+
+    if (!user || !user.isMobileVerified) {
+      const error = new Error(
+        "Mobile number is not verified"
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const emailOwner = await findByEmail(email);
+
+    if (
+      emailOwner &&
+      emailOwner._id.toString() !== user._id.toString()
+    ) {
+      const error = new Error(
+        "Email is already registered"
+      );
+      error.statusCode = 409;
+      throw error;
+    }
+  }
+
   const verifiedOtp =
     await markOtpVerified(otpRecord);
+
+  if (user) {
+    await setEmailVerified(user._id, email);
+  } else {
+    await markEmailVerifiedByEmail(email);
+  }
 
   return {
     email: verifiedOtp.email,
     verified: true,
+    isEmailVerified: true,
     verifiedAt: verifiedOtp.verifiedAt,
   };
 };

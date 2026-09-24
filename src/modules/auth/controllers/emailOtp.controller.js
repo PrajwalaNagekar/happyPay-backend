@@ -28,7 +28,8 @@ const verifyOtp = async (req, res) => {
   try {
     const data = await verifyEmailOtp(
       req.body.email,
-      req.body.otp
+      req.body.otp,
+      req.body.mobile
     );
 
     return res.status(200).json(

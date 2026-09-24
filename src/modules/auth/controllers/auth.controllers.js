@@ -1,7 +1,8 @@
 import {
     retailerLogin,
     retailerLogout,
-  } from "../services/auth.services.js"; 
+  } from "../services/auth.services.js";
+  import { registerRetailer as registerRetailerService } from "../services/registration.service.js";
 
   import ApiResponse from "../../../utils/ApiResponse.js";
   
@@ -98,7 +99,30 @@ import {
   };
 
 
+  const registerRetailer = async (req, res) => {
+    try {
+      const data = await registerRetailerService(req.body);
+
+      return res.status(201).json(
+        ApiResponse.success(
+          data,
+          "Retailer registered successfully"
+        )
+      );
+    } catch (error) {
+      return res.status(error.statusCode || 500).json(
+        ApiResponse.error(
+          error.message || "Registration failed",
+          null,
+          error.meta || null
+        )
+      );
+    }
+  };
+
+
   export {
     loginRetailer,
     logoutRetailer,
+    registerRetailer,
   };

@@ -31,10 +31,20 @@ const markOtpVerified = async (otpRecord) => {
   return await otpRecord.save();
 };
 
+const findVerifiedOtp = async (email) => {
+  return await EmailOtp.findOne({
+    email,
+    isVerified: true,
+  }).sort({
+    verifiedAt: -1,
+  });
+};
+
 
 export {
   findLatestOtp,
   deleteExistingOtps,
   createOtp,
   markOtpVerified,
+  findVerifiedOtp,
 };

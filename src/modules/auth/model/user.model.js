@@ -227,6 +227,26 @@ const userSchema = new mongoose.Schema(
     },
 
     // =========================
+    // Merchant Onboarding
+    // =========================
+    outletId: {
+      type: String,
+      trim: true,
+    },
+
+    adminApproved: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
+
+    reasonOfRejection: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+
+    // =========================
     // RBAC
     // =========================
     roles: [
