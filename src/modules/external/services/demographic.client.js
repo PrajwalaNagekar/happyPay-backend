@@ -101,11 +101,13 @@ const verifyAccount = async ({
   return response.data;
 };
 
-const getBankList = async () => {
+
+const getBankList = async ({ page = 1, limit = 10 } = {}) => {
   const response = await providerClient.get(
     "/api/public/aeps5/bank5/banks"
   );
-  const banks = result?.data || [];
+
+  const banks = response.data?.BankList || [];
 
   const total = banks.length;
 
@@ -120,7 +122,6 @@ const getBankList = async () => {
 
   return {
     data: paginatedBanks,
-
     meta: {
       total,
       page,
@@ -129,6 +130,7 @@ const getBankList = async () => {
     },
   };
 };
+
 
 export {
   verifyAadhar,

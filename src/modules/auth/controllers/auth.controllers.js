@@ -185,9 +185,67 @@ import {
     }
   };
 
-
+  const getBankListController = async (req, res) => {
+    try {
+      const page = Math.max(
+        Number(req.query.page) || 1,
+        1
+      );
+  
+      const limit = Math.min(
+        Math.max(Number(req.query.limit) || 10, 1),
+        100
+      );
+  
+      const result = await getBankList({
+        page,
+        limit,
+      });
+  
+      return res.status(200).json(
+        ApiResponse.success(
+          result.data,
+          "Bank list fetched successfully",
+          result.meta
+        )
+      );
+    } catch (error) {
+      console.error(
+        "Bank list fetching error:",
+        error.message
+      );
+  
+      console.error(
+        "Provider response:",
+        error.response?.data
+      );
+  
+      const providerStatus = error.response?.status;
+  
+      const statusCode =
+        providerStatus >= 400 &&
+        providerStatus < 500
+          ? providerStatus
+          : 502;
+  
+      const message =
+        error.response?.data?.msg ||
+        error.response?.data?.message ||
+        "Failed to fetch bank list";
+  
+      return res.status(statusCode).json(
+        ApiResponse.error(
+          message,
+          error.response?.data || null
+        )
+      );
+    }
+  };
+  
+  
   export {
     loginRetailer,
     logoutRetailer,
     registerRetailer,
+    getBankListController,
   };

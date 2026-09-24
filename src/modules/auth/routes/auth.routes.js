@@ -6,7 +6,7 @@ import {
   registerRetailer,
 } from "../controllers/auth.controllers.js";
 import { uploadRetailerDocuments } from "../../../utils/multer.js";
-import { getBankListController } from "../services/auth.services.js";
+import { getBankListController } from "../controllers/auth.controllers.js";
 
 const router = express.Router();
 
