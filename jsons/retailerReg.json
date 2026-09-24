@@ -1,36 +1,55 @@
 {
-    "info": {
-      "name": "HappyPay Retailer Register",
-      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-    },
-    "item": [
-      {
-        "name": "Register Retailer",
-        "request": {
-          "method": "POST",
-          "header": [
-            {
-              "key": "Content-Type",
-              "value": "application/json"
-            }
-          ],
-          "body": {
-            "mode": "raw",
-            "raw": "{\n  \"mobile\": \"9876543210\",\n  \"name\": \"R Ashok\",\n  \"gender\": \"M\",\n  \"pan\": \"ABCDE1234F\",\n  \"email\": \"ashok@example.com\",\n  \"aadhaar\": \"123412341234\",\n  \"fulladdress\": \"S/O: RAMAMOORTHY, 2/352, THIMMASANDIRAM, NACHIKUPPAM\",\n  \"pincode\": \"635121\",\n  \"city\": \"VEPPANAPALLI\",\n  \"dob\": \"2002-11-26\",\n  \"latitude\": \"12.9716\",\n  \"longitude\": \"77.5946\"\n}",
-            "options": {
-              "raw": {
-                "language": "json"
-              }
-            }
-          },
-          "url": {
-            "raw": "http://localhost:7000/api/v1/auth/retailer/register",
-            "protocol": "http",
-            "host": ["localhost"],
-            "port": "7000",
-            "path": ["api", "v1", "auth", "retailer", "register"]
-          }
+  "info": {
+    "name": "HappyPay Retailer Register",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register Retailer",
+      "request": {
+        "method": "POST",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "mobile", "value": "9876543210", "type": "text" },
+            { "key": "name", "value": "R Ashok", "type": "text" },
+            { "key": "gender", "value": "M", "type": "text" },
+            { "key": "pan", "value": "ABCDE1234F", "type": "text" },
+            { "key": "email", "value": "ashok@example.com", "type": "text" },
+            { "key": "aadhaar", "value": "123412341234", "type": "text" },
+            { "key": "fulladdress", "value": "S/O: RAMAMOORTHY, 2/352, THIMMASANDIRAM, NACHIKUPPAM", "type": "text" },
+            { "key": "pincode", "value": "635121", "type": "text" },
+            { "key": "city", "value": "VEPPANAPALLI", "type": "text" },
+            { "key": "dob", "value": "2002-11-26", "type": "text" },
+            { "key": "latitude", "value": "12.9716", "type": "text" },
+            { "key": "longitude", "value": "77.5946", "type": "text" },
+            { "key": "shopName", "value": "Ashok General Store", "type": "text" },
+            { "key": "shopCategory", "value": "64b000000000000000000001", "type": "text" },
+            { "key": "propertyType", "value": "64b000000000000000000002", "type": "text" },
+            { "key": "shopAddress", "value": "2/352, Thimmasandiram, Nachikuppam, Veppanapalli, Krishnagiri, Tamil Nadu - 635121", "type": "text" },
+            { "key": "maritalStatus", "value": "single", "type": "text" },
+            { "key": "educationalQualification", "value": "64b000000000000000000003", "type": "text" },
+            { "key": "fatherName", "value": "Ramamoorthy", "type": "text" },
+            { "key": "businessProof", "value": "64b000000000000000000004", "type": "text" },
+            { "key": "bankName", "value": "State Bank of India", "type": "text" },
+            { "key": "ifscCode", "value": "SBIN0001234", "type": "text" },
+            { "key": "selfie", "type": "file", "src": "" },
+            { "key": "panDocument", "type": "file", "src": "" },
+            { "key": "aadhaarDocument", "type": "file", "src": "" },
+            { "key": "shopInsidePhoto", "type": "file", "src": "" },
+            { "key": "shopOutsidePhoto", "type": "file", "src": "" },
+            { "key": "shopLocationPhoto", "type": "file", "src": "" },
+            { "key": "businessProofDocument", "type": "file", "src": "" }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:7000/api/v1/auth/retailer/register",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "7000",
+          "path": ["api", "v1", "auth", "retailer", "register"]
         }
       }
-    ]
-  }
+    }
+  ]
+}

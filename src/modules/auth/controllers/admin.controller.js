@@ -1,4 +1,10 @@
-import { createAdminService, loginAdminService } from "../services/admin.services.js";
+import {
+  createAdminService,
+  loginAdminService,
+  getPendingRetailersService,
+  approveRetailerService,
+  rejectRetailerService,
+} from "../services/admin.services.js";
 import ApiResponse from "../../../utils/ApiResponse.js";
 
 const createAdminController = async (req, res) => {
@@ -48,4 +54,55 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-export { createAdminController, loginAdmin };
+const getPendingRetailers = async (req, res) => {
+  try {
+    const data = await getPendingRetailersService();
+
+    return res
+      .status(200)
+      .json(ApiResponse.success(data, "Pending retailers fetched successfully"));
+  } catch (error) {
+    return res
+      .status(error.statusCode || 500)
+      .json(ApiResponse.error(error.message || "Failed to fetch pending retailers"));
+  }
+};
+
+const approveRetailer = async (req, res) => {
+  try {
+    const data = await approveRetailerService(req.params.retailerId);
+
+    return res
+      .status(200)
+      .json(ApiResponse.success(data, "Retailer approved successfully"));
+  } catch (error) {
+    return res
+      .status(error.statusCode || 500)
+      .json(ApiResponse.error(error.message || "Retailer approval failed"));
+  }
+};
+
+const rejectRetailer = async (req, res) => {
+  try {
+    const data = await rejectRetailerService(
+      req.params.retailerId,
+      req.body.reasonOfRejection
+    );
+
+    return res
+      .status(200)
+      .json(ApiResponse.success(data, "Retailer rejected successfully"));
+  } catch (error) {
+    return res
+      .status(error.statusCode || 500)
+      .json(ApiResponse.error(error.message || "Retailer rejection failed"));
+  }
+};
+
+export {
+  createAdminController,
+  loginAdmin,
+  getPendingRetailers,
+  approveRetailer,
+  rejectRetailer,
+};

@@ -13,6 +13,11 @@ const userSchema = new mongoose.Schema(
       uppercase: true,
     },
 
+    panDocument: {
+      type: String,
+      trim: true,
+    },
+
     mobile: {
       type: String,
       trim: true,
@@ -45,7 +50,7 @@ const userSchema = new mongoose.Schema(
 
       category: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "ShopCategory",
+        ref: "Category",
       },
 
       propertyType: {
@@ -75,6 +80,11 @@ const userSchema = new mongoose.Schema(
         },
       },
 
+      completeAddress: {
+        type: String,
+        trim: true,
+      },
+
       location: {
         latitude: {
           type: Number,
@@ -90,6 +100,11 @@ const userSchema = new mongoose.Schema(
     // Retailer Details
     // =========================
     fullName: {
+      type: String,
+      trim: true,
+    },
+
+    fatherName: {
       type: String,
       trim: true,
     },

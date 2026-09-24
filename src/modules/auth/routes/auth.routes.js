@@ -5,12 +5,14 @@ import {
   logoutRetailer,
   registerRetailer,
 } from "../controllers/auth.controllers.js";
+import { uploadRetailerDocuments } from "../../../utils/multer.js";
 
 const router = express.Router();
 
 
 router.post(
   "/retailer/register",
+  uploadRetailerDocuments,
   registerRetailer
 );
 

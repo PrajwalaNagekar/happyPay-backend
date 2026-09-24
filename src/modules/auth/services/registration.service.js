@@ -1,4 +1,9 @@
+import mongoose from "mongoose";
 import onboardMerchant from "../../external/services/onboardMerchant.client.js";
+import Category from "../../masterdata/model/catagory.model.js";
+import PropertyType from "../../masterdata/model/propertyType.model.js";
+import EducationalQualification from "../../masterdata/model/EducationalQualification.model.js";
+import ProofType from "../../masterdata/model/ProofType.model.js";
 import { findVerifiedOtp } from "../repository/emailOtp.repository.js";
 import {
   findByAadhaar,
@@ -45,12 +50,46 @@ const buildRetailerResponse = (user) => ({
   city: user.shop?.address?.city || null,
   state: user.shop?.address?.state || null,
   pincode: user.shop?.address?.pincode || null,
+  shopName: user.shop?.name || null,
+  shopCategory: user.shop?.category || null,
+  propertyType: user.shop?.propertyType || null,
+  shopAddress: user.shop?.completeAddress || null,
   latitude: user.shop?.location?.latitude ?? null,
   longitude: user.shop?.location?.longitude ?? null,
+  selfie: user.selfie || null,
+  maritalStatus: user.maritalStatus || null,
+  educationalQualification: user.educationalQualification || null,
+  panDocument: user.panDocument || null,
+  fatherName: user.fatherName || null,
+  aadhaarDocument: user.aadhaarDocument || null,
+  shopInsidePhoto: user.shopInsidePhoto || null,
+  shopOutsidePhoto: user.shopOutsidePhoto || null,
+  shopLocationPhoto: user.shopLocationPhoto || null,
+  businessProof: user.businessProofType || null,
+  businessProofDocument: user.businessProofDocument || null,
+  bankName: user.bank?.name || null,
+  ifscCode: user.bank?.ifscCode || null,
   outletId: user.outletId || null,
   adminApproved: user.adminApproved,
   reasonOfRejection: user.reasonOfRejection || null,
 });
+
+const assertActiveMaster = async (Model, id, label) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw fail(400, `Invalid ${label}`);
+  }
+
+  const record = await Model.findOne({
+    _id: id,
+    isActive: true,
+  });
+
+  if (!record) {
+    throw fail(400, `${label} not found`);
+  }
+
+  return record._id;
+};
 
 const registerRetailer = async (body = {}) => {
   const mobile = isBlank(body.mobile) ? "" : String(body.mobile).trim();
@@ -67,6 +106,51 @@ const registerRetailer = async (body = {}) => {
   const dob = isBlank(body.dob) ? "" : String(body.dob).trim();
   const latitude = body.latitude;
   const longitude = body.longitude;
+  const shopName = isBlank(body.shopName) ? "" : String(body.shopName).trim();
+  const shopCategory = isBlank(body.shopCategory)
+    ? ""
+    : String(body.shopCategory).trim();
+  const propertyType = isBlank(body.propertyType)
+    ? ""
+    : String(body.propertyType).trim();
+  const shopAddress = isBlank(body.shopAddress)
+    ? ""
+    : String(body.shopAddress).trim();
+  const selfie = isBlank(body.selfie) ? "" : String(body.selfie).trim();
+  const maritalStatus = isBlank(body.maritalStatus)
+    ? ""
+    : String(body.maritalStatus).trim();
+  const educationalQualification = isBlank(body.educationalQualification)
+    ? ""
+    : String(body.educationalQualification).trim();
+  const panDocument = isBlank(body.panDocument)
+    ? ""
+    : String(body.panDocument).trim();
+  const fatherName = isBlank(body.fatherName)
+    ? ""
+    : String(body.fatherName).trim();
+  const aadhaarDocument = isBlank(body.aadhaarDocument)
+    ? ""
+    : String(body.aadhaarDocument).trim();
+  const shopInsidePhoto = isBlank(body.shopInsidePhoto)
+    ? ""
+    : String(body.shopInsidePhoto).trim();
+  const shopOutsidePhoto = isBlank(body.shopOutsidePhoto)
+    ? ""
+    : String(body.shopOutsidePhoto).trim();
+  const shopLocationPhoto = isBlank(body.shopLocationPhoto)
+    ? ""
+    : String(body.shopLocationPhoto).trim();
+  const businessProof = isBlank(body.businessProof)
+    ? ""
+    : String(body.businessProof).trim();
+  const businessProofDocument = isBlank(body.businessProofDocument)
+    ? ""
+    : String(body.businessProofDocument).trim();
+  const bankName = isBlank(body.bankName) ? "" : String(body.bankName).trim();
+  const ifscCode = isBlank(body.ifscCode)
+    ? ""
+    : String(body.ifscCode).trim().toUpperCase();
 
   const required = {
     mobile,
@@ -81,6 +165,23 @@ const registerRetailer = async (body = {}) => {
     dob,
     latitude,
     longitude,
+    shopName,
+    shopCategory,
+    propertyType,
+    shopAddress,
+    selfie,
+    maritalStatus,
+    educationalQualification,
+    panDocument,
+    fatherName,
+    aadhaarDocument,
+    shopInsidePhoto,
+    shopOutsidePhoto,
+    shopLocationPhoto,
+    businessProof,
+    businessProofDocument,
+    bankName,
+    ifscCode,
   };
 
   const missing = Object.entries(required)
@@ -134,6 +235,26 @@ const registerRetailer = async (body = {}) => {
   ) {
     throw fail(400, "Please enter a valid longitude");
   }
+
+  if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifscCode)) {
+    throw fail(400, "Please enter a valid IFSC code");
+  }
+
+  const [
+    shopCategoryId,
+    propertyTypeId,
+    educationalQualificationId,
+    businessProofId,
+  ] = await Promise.all([
+    assertActiveMaster(Category, shopCategory, "shop category"),
+    assertActiveMaster(PropertyType, propertyType, "property type"),
+    assertActiveMaster(
+      EducationalQualification,
+      educationalQualification,
+      "educational qualification"
+    ),
+    assertActiveMaster(ProofType, businessProof, "business proof"),
+  ]);
 
   const user = await findByMobile(mobile);
 
@@ -249,8 +370,25 @@ const registerRetailer = async (body = {}) => {
     "shop.address.pincode": providerData.pincode
       ? String(providerData.pincode)
       : pincode,
+    "shop.name": shopName,
+    "shop.category": shopCategoryId,
+    "shop.propertyType": propertyTypeId,
+    "shop.completeAddress": shopAddress,
     "shop.location.latitude": parsedLatitude,
     "shop.location.longitude": parsedLongitude,
+    selfie,
+    maritalStatus,
+    educationalQualification: educationalQualificationId,
+    panDocument,
+    fatherName,
+    aadhaarDocument,
+    shopInsidePhoto,
+    shopOutsidePhoto,
+    shopLocationPhoto,
+    businessProofType: businessProofId,
+    businessProofDocument,
+    "bank.name": bankName,
+    "bank.ifscCode": ifscCode,
     outletId: String(outletId),
     adminApproved: "pending",
     reasonOfRejection: null,

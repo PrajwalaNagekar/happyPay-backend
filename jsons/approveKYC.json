@@ -1,0 +1,112 @@
+{
+    "info": {
+      "name": "HappyPay Admin Retailer Review",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+      {
+        "key": "baseUrl",
+        "value": "http://localhost:7000"
+      },
+      {
+        "key": "accessToken",
+        "value": ""
+      },
+      {
+        "key": "retailerId",
+        "value": ""
+      }
+    ],
+    "item": [
+      {
+        "name": "Admin Login",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"your-password\"\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": {
+            "raw": "{{baseUrl}}/api/v1/auth/admin/login",
+            "host": ["{{baseUrl}}"],
+            "path": ["api", "v1", "auth", "admin", "login"]
+          }
+        }
+      },
+      {
+        "name": "Get Pending Retailers",
+        "request": {
+          "method": "GET",
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{accessToken}}"
+            }
+          ],
+          "url": {
+            "raw": "{{baseUrl}}/api/v1/auth/admin/retailers/pending",
+            "host": ["{{baseUrl}}"],
+            "path": ["api", "v1", "auth", "admin", "retailers", "pending"]
+          }
+        }
+      },
+      {
+        "name": "Approve Retailer",
+        "request": {
+          "method": "PATCH",
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{accessToken}}"
+            }
+          ],
+          "url": {
+            "raw": "{{baseUrl}}/api/v1/auth/admin/retailers/{{retailerId}}/approve",
+            "host": ["{{baseUrl}}"],
+            "path": ["api", "v1", "auth", "admin", "retailers", "{{retailerId}}", "approve"]
+          }
+        }
+      },
+      {
+        "name": "Reject Retailer",
+        "request": {
+          "method": "PATCH",
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{accessToken}}"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"reasonOfRejection\": \"Shop address does not match the KYC document\"\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "url": {
+            "raw": "{{baseUrl}}/api/v1/auth/admin/retailers/{{retailerId}}/reject",
+            "host": ["{{baseUrl}}"],
+            "path": ["api", "v1", "auth", "admin", "retailers", "{{retailerId}}", "reject"]
+          }
+        }
+      }
+    ]
+  }

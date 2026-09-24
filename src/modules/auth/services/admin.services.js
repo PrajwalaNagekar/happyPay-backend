@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import mongoose from "mongoose";
 import Role from "../model/role.model.js";
 
 import { generateAccessToken } from "../../../utils/jwt.js";
@@ -8,6 +9,11 @@ import {
   findAdminForLogin,
   createAdmin,
 } from "../repository/admin.repository.js";
+import {
+  findPendingRegisteredRetailers,
+  findRetailerById,
+  updateRetailerReview,
+} from "../repository/user.repository.js";
 
 const createAdminService = async ({
     firstName,
@@ -108,4 +114,135 @@ const loginAdminService = async ({
   };
 };
 
-export { createAdminService, loginAdminService };
+const fail = (statusCode, message) => {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
+};
+
+const toDateOnly = (value) => {
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date.toISOString().slice(0, 10);
+};
+
+const buildRetailerReview = (user) => ({
+  id: user._id,
+  mobile: user.mobile,
+  isMobileVerified: user.isMobileVerified,
+  email: user.email,
+  isEmailVerified: user.isEmailVerified,
+  fullName: user.fullName,
+  gender: user.gender,
+  panNumber: user.panNumber,
+  aadhaarNumber: user.aadhaarNumber,
+  dateOfBirth: toDateOnly(user.dateOfBirth),
+  fullAddress: user.shop?.address?.addressLine || null,
+  city: user.shop?.address?.city || null,
+  state: user.shop?.address?.state || null,
+  pincode: user.shop?.address?.pincode || null,
+  shopName: user.shop?.name || null,
+  shopCategory: user.shop?.category || null,
+  propertyType: user.shop?.propertyType || null,
+  shopAddress: user.shop?.completeAddress || null,
+  latitude: user.shop?.location?.latitude ?? null,
+  longitude: user.shop?.location?.longitude ?? null,
+  selfie: user.selfie || null,
+  maritalStatus: user.maritalStatus || null,
+  educationalQualification: user.educationalQualification || null,
+  panDocument: user.panDocument || null,
+  fatherName: user.fatherName || null,
+  aadhaarDocument: user.aadhaarDocument || null,
+  shopInsidePhoto: user.shopInsidePhoto || null,
+  shopOutsidePhoto: user.shopOutsidePhoto || null,
+  shopLocationPhoto: user.shopLocationPhoto || null,
+  businessProof: user.businessProofType || null,
+  businessProofDocument: user.businessProofDocument || null,
+  bankName: user.bank?.name || null,
+  ifscCode: user.bank?.ifscCode || null,
+  outletId: user.outletId,
+  adminApproved: user.adminApproved,
+  reasonOfRejection: user.reasonOfRejection || null,
+  registeredAt: user.updatedAt,
+});
+
+const assertRetailerId = (retailerId) => {
+  if (!mongoose.Types.ObjectId.isValid(retailerId)) {
+    throw fail(400, "Invalid retailer id");
+  }
+};
+
+const getPendingRetailerReview = async (retailerId) => {
+  assertRetailerId(retailerId);
+
+  const retailer = await findRetailerById(retailerId);
+
+  if (!retailer || !retailer.outletId) {
+    throw fail(404, "Registered retailer not found");
+  }
+
+  if (retailer.adminApproved !== "pending") {
+    throw fail(
+      409,
+      `Retailer is already ${retailer.adminApproved}`
+    );
+  }
+
+  return retailer;
+};
+
+const getPendingRetailersService = async () => {
+  const retailers = await findPendingRegisteredRetailers();
+  return retailers.map(buildRetailerReview);
+};
+
+const approveRetailerService = async (retailerId) => {
+  await getPendingRetailerReview(retailerId);
+
+  const retailer = await updateRetailerReview(retailerId, {
+    adminApproved: "approved",
+    reasonOfRejection: null,
+  });
+
+  if (!retailer) {
+    throw fail(409, "Retailer is no longer pending");
+  }
+
+  return buildRetailerReview(retailer);
+};
+
+const rejectRetailerService = async (retailerId, reasonOfRejection) => {
+  const reason = String(reasonOfRejection || "").trim();
+
+  if (!reason) {
+    throw fail(400, "Reason of rejection is required");
+  }
+
+  await getPendingRetailerReview(retailerId);
+
+  const retailer = await updateRetailerReview(retailerId, {
+    adminApproved: "rejected",
+    reasonOfRejection: reason,
+  });
+
+  if (!retailer) {
+    throw fail(409, "Retailer is no longer pending");
+  }
+
+  return buildRetailerReview(retailer);
+};
+
+export {
+  createAdminService,
+  loginAdminService,
+  getPendingRetailersService,
+  approveRetailerService,
+  rejectRetailerService,
+};

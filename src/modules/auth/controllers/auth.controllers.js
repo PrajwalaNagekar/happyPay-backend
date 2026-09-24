@@ -5,6 +5,46 @@ import {
   import { registerRetailer as registerRetailerService } from "../services/registration.service.js";
 
   import ApiResponse from "../../../utils/ApiResponse.js";
+  import cloudinary from "../../../config/cloudinary.js";
+  import logger from "../../../utils/logger.js";
+
+  const retailerFileFields = [
+    "selfie",
+    "panDocument",
+    "aadhaarDocument",
+    "shopInsidePhoto",
+    "shopOutsidePhoto",
+    "shopLocationPhoto",
+    "businessProofDocument",
+  ];
+
+  const uploadedRetailerFiles = (files = {}) =>
+    retailerFileFields.flatMap((field) => files[field] || []);
+
+  const cloudinaryResourceType = (fileUrl = "") =>
+    String(fileUrl).match(/\/(image|raw|video)\/upload\//)?.[1] || "image";
+
+  const removeUploadedRetailerFiles = async (files = []) => {
+    await Promise.all(
+      files.map(async (file) => {
+        if (!file?.filename) {
+          return;
+        }
+
+        try {
+          await cloudinary.uploader.destroy(file.filename, {
+            resource_type: cloudinaryResourceType(file.path),
+            invalidate: true,
+          });
+        } catch (cleanupError) {
+          logger.error(
+            `Cloudinary cleanup failed for ${file.filename}`,
+            cleanupError
+          );
+        }
+      })
+    );
+  };
   
   
   const loginRetailer = async (
@@ -100,8 +140,20 @@ import {
 
 
   const registerRetailer = async (req, res) => {
+    const files = uploadedRetailerFiles(req.files);
+
     try {
-      const data = await registerRetailerService(req.body);
+      const documents = Object.fromEntries(
+        retailerFileFields.map((field) => [
+          field,
+          req.files?.[field]?.[0]?.path || "",
+        ])
+      );
+
+      const data = await registerRetailerService({
+        ...req.body,
+        ...documents,
+      });
 
       return res.status(201).json(
         ApiResponse.success(
@@ -110,6 +162,8 @@ import {
         )
       );
     } catch (error) {
+      await removeUploadedRetailerFiles(files);
+
       return res.status(error.statusCode || 500).json(
         ApiResponse.error(
           error.message || "Registration failed",

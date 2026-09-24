@@ -128,6 +128,98 @@ const multerOptions = {
  * Example:
  * upload.array("attachments", 5)
  */
+const retailerStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "happypay/retailers",
+    resource_type: "auto",
+  },
+});
+
+const retailerPhotoFields = new Set([
+  "selfie",
+  "shopInsidePhoto",
+  "shopOutsidePhoto",
+  "shopLocationPhoto",
+]);
+
+const retailerDocumentFields = new Set([
+  "panDocument",
+  "aadhaarDocument",
+  "businessProofDocument",
+]);
+
+const imageMimeTypes = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
+
+const documentMimeTypes = [
+  ...imageMimeTypes,
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+];
+
+const imageExtensions = [".jpg", ".jpeg", ".png", ".webp"];
+const documentExtensions = [...imageExtensions, ".pdf", ".doc", ".docx"];
+
+const retailerFileFilter = (req, file, cb) => {
+  const isPhoto = retailerPhotoFields.has(file.fieldname);
+  const isDocument = retailerDocumentFields.has(file.fieldname);
+
+  if (!isPhoto && !isDocument) {
+    return cb(
+      new ApiError(400, `Unexpected file field: ${file.fieldname}`),
+      false
+    );
+  }
+
+  const allowedMimes = isPhoto ? imageMimeTypes : documentMimeTypes;
+  const allowedExts = isPhoto ? imageExtensions : documentExtensions;
+
+  if (allowedMimes.includes(file.mimetype)) {
+    return cb(null, true);
+  }
+
+  if (
+    file.mimetype === "application/octet-stream" ||
+    file.mimetype === "application/x-octet-stream"
+  ) {
+    const extension = path
+      .extname(file.originalname || "")
+      .toLowerCase();
+
+    if (!extension || allowedExts.includes(extension)) {
+      return cb(null, true);
+    }
+  }
+
+  return cb(
+    new ApiError(400, `File type ${file.mimetype} is not allowed`),
+    false
+  );
+};
+
+export const uploadRetailerDocuments = multer({
+  storage: retailerStorage,
+  limits: {
+    fileSize: 10 * 1024 * 1024,
+    files: 7,
+  },
+  fileFilter: retailerFileFilter,
+}).fields([
+  { name: "selfie", maxCount: 1 },
+  { name: "panDocument", maxCount: 1 },
+  { name: "aadhaarDocument", maxCount: 1 },
+  { name: "shopInsidePhoto", maxCount: 1 },
+  { name: "shopOutsidePhoto", maxCount: 1 },
+  { name: "shopLocationPhoto", maxCount: 1 },
+  { name: "businessProofDocument", maxCount: 1 },
+]);
+
 export const upload = multer(multerOptions);
 
 /**
