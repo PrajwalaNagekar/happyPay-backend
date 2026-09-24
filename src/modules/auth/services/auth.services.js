@@ -350,12 +350,26 @@ const retailerLogout = async ({
 
 const getBankListController = async (req, res) => {
   try {
-    const result = await getBankList();
+    const page = Math.max(
+      Number(req.query.page) || 1,
+      1
+    );
+
+    const limit = Math.min(
+      Math.max(Number(req.query.limit) || 10, 1),
+      100
+    );
+
+    const result = await getBankList({
+      page,
+      limit,
+    });
 
     return res.status(200).json(
       ApiResponse.success(
-        result,
-        "Bank list fetched successfully"
+        result.data,
+        "Bank list fetched successfully",
+        result.meta
       )
     );
   } catch (error) {
@@ -372,7 +386,8 @@ const getBankListController = async (req, res) => {
     const providerStatus = error.response?.status;
 
     const statusCode =
-      providerStatus >= 400 && providerStatus < 500
+      providerStatus >= 400 &&
+        providerStatus < 500
         ? providerStatus
         : 502;
 
