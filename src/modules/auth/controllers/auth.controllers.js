@@ -7,6 +7,7 @@ import {
   import ApiResponse from "../../../utils/ApiResponse.js";
   import cloudinary from "../../../config/cloudinary.js";
   import logger from "../../../utils/logger.js";
+import { getBankList } from "../../external/services/demographic.client.js";
 
   const retailerFileFields = [
     "selfie",
