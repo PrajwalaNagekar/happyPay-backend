@@ -101,12 +101,34 @@ const verifyAccount = async ({
   return response.data;
 };
 
-  const getBankList = async () => {
-    const response = await providerClient.get(
-      "/api/public/aeps5/bank5/banks"
-    );
-    return response.data;
+const getBankList = async () => {
+  const response = await providerClient.get(
+    "/api/public/aeps5/bank5/banks"
+  );
+  const banks = result?.data || [];
+
+  const total = banks.length;
+
+  const skip = (page - 1) * limit;
+
+  const paginatedBanks = banks.slice(
+    skip,
+    skip + limit
+  );
+
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    data: paginatedBanks,
+
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages,
+    },
   };
+};
 
 export {
   verifyAadhar,
