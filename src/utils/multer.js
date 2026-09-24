@@ -170,20 +170,36 @@ const retailerFileFilter = (req, file, cb) => {
   const isPhoto = retailerPhotoFields.has(file.fieldname);
   const isDocument = retailerDocumentFields.has(file.fieldname);
 
+  // Reject unknown field names
   if (!isPhoto && !isDocument) {
     return cb(
-      new ApiError(400, `Unexpected file field: ${file.fieldname}`),
+      new ApiError(
+        400,
+        `Unexpected file field: ${file.fieldname}`
+      ),
       false
     );
   }
 
-  const allowedMimes = isPhoto ? imageMimeTypes : documentMimeTypes;
-  const allowedExts = isPhoto ? imageExtensions : documentExtensions;
+  const allowedMimes = isPhoto
+    ? imageMimeTypes
+    : documentMimeTypes;
 
+  const allowedExts = isPhoto
+    ? imageExtensions
+    : documentExtensions;
+
+  // --------------------------------
+  // Normal MIME type
+  // --------------------------------
   if (allowedMimes.includes(file.mimetype)) {
     return cb(null, true);
   }
 
+  // --------------------------------
+  // Requestly / some clients
+  // send application/octet-stream
+  // --------------------------------
   if (
     file.mimetype === "application/octet-stream" ||
     file.mimetype === "application/x-octet-stream"
@@ -192,13 +208,33 @@ const retailerFileFilter = (req, file, cb) => {
       .extname(file.originalname || "")
       .toLowerCase();
 
-    if (!extension || allowedExts.includes(extension)) {
+    console.log("Retailer file:");
+    console.log("Field:", file.fieldname);
+    console.log("Name:", file.originalname);
+    console.log("MIME:", file.mimetype);
+    console.log("Extension:", extension);
+
+    if (allowedExts.includes(extension)) {
       return cb(null, true);
     }
+
+    return cb(
+      new ApiError(
+        400,
+        `File extension ${extension || "unknown"} is not allowed for ${file.fieldname}`
+      ),
+      false
+    );
   }
 
+  // --------------------------------
+  // Reject unsupported MIME
+  // --------------------------------
   return cb(
-    new ApiError(400, `File type ${file.mimetype} is not allowed`),
+    new ApiError(
+      400,
+      `File type ${file.mimetype} is not allowed`
+    ),
     false
   );
 };
