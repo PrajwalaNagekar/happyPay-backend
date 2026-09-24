@@ -59,13 +59,34 @@ const registeredOutletFilter = {
   outletId: { $exists: true, $nin: [null, ""] },
 };
 
-const findPendingRegisteredRetailers = async () => {
-  return await User.find({
+const findPendingRegisteredRetailers = async ({
+  page = 1,
+  limit = 10,
+} = {}) => {
+  const skip = (page - 1) * limit;
+
+  const filter = {
     adminApproved: "pending",
     ...registeredOutletFilter,
-  })
-    .select("-refreshTokens -devices")
-    .sort({ updatedAt: -1 });
+  };
+
+  const [retailers, total] = await Promise.all([
+    User.find(filter)
+      .select("-refreshTokens -devices")
+      .sort({ updatedAt: -1 })
+      .skip(skip)
+      .limit(limit),
+
+    User.countDocuments(filter),
+  ]);
+
+  return {
+    retailers,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  };
 };
 
 const findRetailerById = async (retailerId) => {

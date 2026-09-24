@@ -6,6 +6,7 @@ import {
   registerRetailer,
 } from "../controllers/auth.controllers.js";
 import { uploadRetailerDocuments } from "../../../utils/multer.js";
+import { getBankListController } from "../services/auth.services.js";
 
 const router = express.Router();
 
@@ -26,5 +27,10 @@ router.post(
   logoutRetailer
 );
 
+router.get(
+  "/banks",
+  
+  getBankListController
+);
 
 export default router;

@@ -56,15 +56,44 @@ const loginAdmin = async (req, res) => {
 
 const getPendingRetailers = async (req, res) => {
   try {
-    const data = await getPendingRetailersService();
+    const page = Math.max(
+      Number(req.query.page) || 1,
+      1
+    );
+
+    const limit = Math.min(
+      Math.max(Number(req.query.limit) || 10, 1),
+      100
+    );
+
+    const result = await getPendingRetailersService({
+      page,
+      limit,
+    });
 
     return res
       .status(200)
-      .json(ApiResponse.success(data, "Pending retailers fetched successfully"));
+      .json(
+        ApiResponse.success(
+          result.data,
+          "Pending retailers fetched successfully",
+          result.meta
+        )
+      );
   } catch (error) {
+    console.error(
+      "Get pending retailers error:",
+      error
+    );
+
     return res
       .status(error.statusCode || 500)
-      .json(ApiResponse.error(error.message || "Failed to fetch pending retailers"));
+      .json(
+        ApiResponse.error(
+          error.message ||
+            "Failed to fetch pending retailers"
+        )
+      );
   }
 };
 

@@ -138,10 +138,9 @@ import {
     }
   };
 
-
   const registerRetailer = async (req, res) => {
     const files = uploadedRetailerFiles(req.files);
-
+  
     try {
       const documents = Object.fromEntries(
         retailerFileFields.map((field) => [
@@ -149,12 +148,12 @@ import {
           req.files?.[field]?.[0]?.path || "",
         ])
       );
-
+  
       const data = await registerRetailerService({
         ...req.body,
         ...documents,
       });
-
+  
       return res.status(201).json(
         ApiResponse.success(
           data,
@@ -163,12 +162,24 @@ import {
       );
     } catch (error) {
       await removeUploadedRetailerFiles(files);
-
-      return res.status(error.statusCode || 500).json(
+  
+      // Validation / business error
+      if (error.statusCode) {
+        return res.status(error.statusCode).json(
+          ApiResponse.error(
+            error.message,
+            null,
+            error.meta || null
+          )
+        );
+      }
+  
+      // Unexpected server error
+      console.error("Register retailer error:", error);
+  
+      return res.status(500).json(
         ApiResponse.error(
-          error.message || "Registration failed",
-          null,
-          error.meta || null
+          "Something went wrong while registering retailer"
         )
       );
     }

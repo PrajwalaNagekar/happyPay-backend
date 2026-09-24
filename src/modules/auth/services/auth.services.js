@@ -1,10 +1,12 @@
 import env from "../../../config/env.js";
+import ApiResponse from "../../../utils/ApiResponse.js";
 
 import {
   generateAccessToken,
   generateRefreshToken,
 } from "../../../utils/jwt.js";
 import { resolveUserAccess } from "../../../utils/rbac.js";
+import { getBankList } from "../../external/services/demographic.client.js";
 
 import {
   findRetailerByEmail,
@@ -346,7 +348,51 @@ const retailerLogout = async ({
 };
 
 
+const getBankListController = async (req, res) => {
+  try {
+    const result = await getBankList();
+
+    return res.status(200).json(
+      ApiResponse.success(
+        result,
+        "Bank list fetched successfully"
+      )
+    );
+  } catch (error) {
+    console.error(
+      "Bank list fetching error:",
+      error.message
+    );
+
+    console.error(
+      "Provider response:",
+      error.response?.data
+    );
+
+    const providerStatus = error.response?.status;
+
+    const statusCode =
+      providerStatus >= 400 && providerStatus < 500
+        ? providerStatus
+        : 502;
+
+    const message =
+      error.response?.data?.msg ||
+      error.response?.data?.message ||
+      "Failed to fetch bank list";
+
+    return res.status(statusCode).json(
+      ApiResponse.error(
+        message,
+        error.response?.data || null
+      )
+    );
+  }
+};
+
+
 export {
   retailerLogin,
   retailerLogout,
+  getBankListController,
 };

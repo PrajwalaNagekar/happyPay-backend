@@ -198,9 +198,25 @@ const getPendingRetailerReview = async (retailerId) => {
   return retailer;
 };
 
-const getPendingRetailersService = async () => {
-  const retailers = await findPendingRegisteredRetailers();
-  return retailers.map(buildRetailerReview);
+const getPendingRetailersService = async ({
+  page = 1,
+  limit = 10,
+} = {}) => {
+  const result = await findPendingRegisteredRetailers({
+    page,
+    limit,
+  });
+
+  return {
+    data: result.retailers.map(buildRetailerReview),
+
+    meta: {
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+      totalPages: result.totalPages,
+    },
+  };
 };
 
 const approveRetailerService = async (retailerId) => {
