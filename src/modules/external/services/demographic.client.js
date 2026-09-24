@@ -107,30 +107,27 @@ const getBankList = async ({ page = 1, limit = 10 } = {}) => {
     "/api/public/aeps5/bank5/banks"
   );
 
+  console.log("========== BANK API RESPONSE ==========");
+  console.log("response.data:", response.data);
+  console.log("BankList:", response.data?.BankList);
+  console.log("Is Array:", Array.isArray(response.data?.BankList));
+  console.log("=======================================");
+
   const banks = response.data?.BankList || [];
 
   const total = banks.length;
-
   const skip = (page - 1) * limit;
 
-  const paginatedBanks = banks.slice(
-    skip,
-    skip + limit
-  );
-
-  const totalPages = Math.ceil(total / limit);
-
   return {
-    data: paginatedBanks,
+    data: banks.slice(skip, skip + limit),
     meta: {
       total,
       page,
       limit,
-      totalPages,
+      totalPages: Math.ceil(total / limit),
     },
   };
 };
-
 
 export {
   verifyAadhar,
