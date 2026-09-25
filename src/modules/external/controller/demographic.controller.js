@@ -1,6 +1,7 @@
 import {
   getBankList,
   verifyAadhar,
+  verifyBiometric,
 } from "../services/demographic.client.js";
 
 const verifyAadharController = async (
@@ -161,9 +162,48 @@ const getBankListController = async (req, res) => {
   }
 };
 
+const verifyBiometricController = async (req, res) => {
+  try {
+    const { outlet_id } = req.body;
+
+    console.log("Biometric verification request:", req.body);
+
+    if (!outlet_id) {
+      return res.status(400).json({
+        success: false,
+        message: "outlet_id is required",
+      });
+    }
+
+    const result = await verifyBiometric({ outlet_id });
+
+    console.log("Biometric verification provider response:", result);
+
+    return res.status(200).json({
+      success: true,
+      message: "Biometric verification initiated successfully",
+      data: result,
+    });
+
+  } catch (error) {
+    console.log("========== BIOMETRIC VERIFICATION API ERROR ==========");
+    console.log("Message:", error.message);
+    console.log("Status:", error.response?.status);
+    console.log("Provider response:", error.response?.data);
+    console.log("======================================================");
+
+    return res.status(error.response?.status || 500).json({
+      success: false,
+      message: "Biometric verification failed",
+      error: error.response?.data || error.message,
+    });
+  }
+};
+
 export {
   verifyAadharController,
   verifyPanController,
   verifyAccountController,
   getBankListController,
+  verifyBiometricController,
 };

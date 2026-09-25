@@ -27,6 +27,17 @@ const findRetailerByEmail = async (email) => {
 
 
 /* ==============================
+   Find Retailer By Mobile
+============================== */
+
+const findRetailerByMobile = async (mobile) => {
+  return await User.findOne({
+    mobile: mobile.trim(),
+  }).populate(rbacPopulate);
+};
+
+
+/* ==============================
    Create Test Retailer
 ============================== */
 
@@ -203,6 +214,7 @@ const deactivateDevice = async (userId, deviceId) => {
 
 export {
   findRetailerByEmail,
+  findRetailerByMobile,
   createTestRetailer,
   updateLastLogin,
   addRefreshToken,

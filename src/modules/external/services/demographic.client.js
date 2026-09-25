@@ -129,9 +129,30 @@ const getBankList = async ({ page = 1, limit = 10 } = {}) => {
   };
 };
 
+const doEkyc = async ({ outlet_id }) => {
+  const form = new FormData();
+
+  form.append("outlet_id", outlet_id);
+
+  const response = await providerClient.post(
+    "/api/public/aeps5/bank5/doekyc",
+    form,
+    {
+      headers: {
+        ...form.getHeaders(),
+      },
+    }
+  );
+
+  return response.data;
+};
+
+const verifyBiometric = doEkyc;
+
 export {
   verifyAadhar,
   verifyPan,
   verifyAccount,
   getBankList,
+  verifyBiometric,
 };

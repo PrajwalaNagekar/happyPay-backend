@@ -55,7 +55,7 @@ import { getBankList } from "../../external/services/demographic.client.js";
     try {
   
       const {
-        email,
+        mobile,
         otp,
         fcmToken,
         deviceId,
@@ -65,7 +65,7 @@ import { getBankList } from "../../external/services/demographic.client.js";
   
   
       const data = await retailerLogin({
-        email,
+        mobile,
         otp,
         fcmToken,
         deviceId,

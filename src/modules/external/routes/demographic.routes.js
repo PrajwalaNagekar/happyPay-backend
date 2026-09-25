@@ -5,6 +5,7 @@ import {
   verifyAadharController,
   verifyAccountController,
   verifyPanController,
+  verifyBiometricController,
 } from "../controller/demographic.controller.js";
 import { onboardMerchantController } from "../controller/onboardMerchant.controler.js";
 
@@ -18,5 +19,6 @@ router.post("/verify-pan", verifyPanController);
 router.post("/verify-account", verifyAccountController);
 router.get("/get-bank-list", getBankListController);
 router.post("/onboard-merchant", onboardMerchantController);
+router.post("/verify-biometric", verifyBiometricController);
 
 export default router;

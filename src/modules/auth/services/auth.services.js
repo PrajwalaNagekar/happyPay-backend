@@ -10,6 +10,7 @@ import { getBankList } from "../../external/services/demographic.client.js";
 
 import {
   findRetailerByEmail,
+  findRetailerByMobile,
   createTestRetailer,
   updateLastLogin,
   addRefreshToken,
@@ -19,13 +20,11 @@ import {
   deactivateDevice,
 } from "../repository/auth.repository.js";
 
-
-/* ==============================
-   Hardcoded Login Credentials
-============================== */
-
-const LOGIN_EMAIL = "retailer@gmail.com";
-const LOGIN_OTP = "123456";
+import {
+  findLatestOtp,
+  markOtpVerified,
+  incrementAttempts,
+} from "../repository/otp.repository.js";
 
 
 /* ==============================
@@ -85,7 +84,7 @@ const getRefreshTokenExpiry = () => {
 ============================== */
 
 const retailerLogin = async ({
-  email,
+  mobile,
   otp,
   fcmToken,
   deviceId,
@@ -97,9 +96,9 @@ const retailerLogin = async ({
      Validate Input
   ============================== */
 
-  if (!email) {
+  if (!mobile) {
     const error = new Error(
-      "Email is required"
+      "Mobile number is required"
     );
 
     error.statusCode = 400;
@@ -151,50 +150,37 @@ const retailerLogin = async ({
 
 
   /* ==============================
-     Check Hardcoded Credentials
+     Find Retailer By Mobile
   ============================== */
 
-  if (
-    email.toLowerCase().trim() !==
-    LOGIN_EMAIL
-  ) {
-    const error = new Error(
-      "Invalid email or OTP"
-    );
-
-    error.statusCode = 401;
-
-    throw error;
-  }
-
-  if (otp.trim() !== LOGIN_OTP) {
-    const error = new Error(
-      "Invalid email or OTP"
-    );
-
-    error.statusCode = 401;
-
-    throw error;
-  }
-
-
-  /* ==============================
-     Find Retailer
-  ============================== */
-
-  let user = await findRetailerByEmail(
-    LOGIN_EMAIL
-  );
-
-
-  /* ==============================
-     Create Test Retailer
-  ============================== */
+  let user = await findRetailerByMobile(mobile);
 
   if (!user) {
-    user = await createTestRetailer(
-      LOGIN_EMAIL
+    const error = new Error(
+      "Retailer not registered. Please register first."
     );
+
+    error.statusCode = 404;
+
+    throw error;
+  }
+
+
+  /* ==============================
+     Verify OTP
+  ============================== */
+
+  // Static OTP verification for now
+  const STATIC_OTP = "123456";
+
+  if (otp.trim() !== STATIC_OTP) {
+    const error = new Error(
+      "Invalid OTP"
+    );
+
+    error.statusCode = 401;
+
+    throw error;
   }
 
 
@@ -215,6 +201,33 @@ const retailerLogin = async ({
   if (user.status === "blocked") {
     const error = new Error(
       "Retailer account is blocked"
+    );
+
+    error.statusCode = 403;
+
+    throw error;
+  }
+
+  if (user.status === "suspended") {
+    const error = new Error(
+      "Retailer account is suspended"
+    );
+
+    error.statusCode = 403;
+
+    throw error;
+  }
+
+
+  /* ==============================
+     Check Admin KYC Approval
+  ============================== */
+
+  if (user.adminApproved !== "approved") {
+    const error = new Error(
+      user.adminApproved === "rejected"
+        ? `Your KYC has been rejected. Reason: ${user.reasonOfRejection || "Not specified"}`
+        : "Your KYC is pending admin approval"
     );
 
     error.statusCode = 403;
@@ -285,8 +298,11 @@ const retailerLogin = async ({
     user: {
       id: user._id,
       email: user.email,
+      mobile: user.mobile,
       status: user.status,
       kycStatus: user.kycStatus,
+      adminApproved: user.adminApproved,
+      outletId: user.outletId,
       roles: access.roles,
       permissions: access.permissions,
     },
