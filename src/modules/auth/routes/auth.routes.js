@@ -7,6 +7,7 @@ import {
 } from "../controllers/auth.controllers.js";
 import { uploadRetailerDocuments } from "../../../utils/multer.js";
 import { getBankListController } from "../controllers/auth.controllers.js";
+import { validateRegisterRetailer } from "../validations/retailer.validation.js";
 
 const router = express.Router();
 
@@ -14,6 +15,7 @@ const router = express.Router();
 router.post(
   "/retailer/register",
   uploadRetailerDocuments,
+  validateRegisterRetailer,
   registerRetailer
 );
 
