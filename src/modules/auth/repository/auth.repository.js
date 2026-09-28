@@ -40,6 +40,21 @@ const createTestRetailer = async (email) => {
   });
 };
 
+const createRetailer = async (data) => {
+  return await User.create({
+    ...data,
+    status: "active",
+    kycStatus: "pending",
+    isActive: true,
+  });
+};
+
+const findRetailerByMobile = async (mobile) => {
+  return await User.findOne({
+    mobile: mobile.trim(),
+  }).populate(rbacPopulate);
+};
+
 
 /* ==============================
    Update Last Login
@@ -201,6 +216,24 @@ const deactivateDevice = async (userId, deviceId) => {
 };
 
 
+/* ==============================
+   Update KYC Status to Pending
+============================== */
+
+const updateKycStatusToPending = async (userId) => {
+  return await User.findByIdAndUpdate(
+    userId,
+    {
+      kycStatus: "pending",
+      kycRejectionReason: "",
+    },
+    {
+      new: true,
+    }
+  );
+};
+
+
 export {
   findRetailerByEmail,
   createTestRetailer,
@@ -210,4 +243,7 @@ export {
   findUserByRefreshToken,
   removeRefreshToken,
   deactivateDevice,
+  updateKycStatusToPending,
+  createRetailer,
+  findRetailerByMobile,
 };

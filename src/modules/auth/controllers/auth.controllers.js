@@ -1,6 +1,8 @@
 import {
     retailerLogin,
     retailerLogout,
+    reapplyForKyc,
+    retailerRegister,
   } from "../services/auth.services.js"; 
 
   import ApiResponse from "../../../utils/ApiResponse.js";
@@ -97,8 +99,47 @@ import {
     }
   };
 
+  const kycReapply = async (
+    req,
+    res
+  ) => {
+    try {
+      const data = await reapplyForKyc(req.user.userId);
+      return res
+        .status(200)
+        .json(
+          ApiResponse.success(
+            data,
+            "KYC reapplied successfully"
+          )
+        );
+    } catch (error) {
+      return res
+        .status(
+          error.statusCode || 500
+        )
+        .json(
+          ApiResponse.error(
+            error.message ||
+              "KYC reapply failed"
+          )
+        );
+    }
+  };
+
+
+  const registerRetailer = async (req, res) => {
+    try {
+      const data = await retailerRegister(req.body);
+      return res.status(201).json(ApiResponse.success(data, "Retailer registered successfully"));
+    } catch (error) {
+      return res.status(error.statusCode || 500).json(ApiResponse.error(error.message || "Registration failed"));
+    }
+  };
 
   export {
     loginRetailer,
     logoutRetailer,
+    kycReapply,
+    registerRetailer,
   };

@@ -6,6 +6,10 @@ import { generateAccessToken, generateRefreshToken } from "../../../utils/jwt.js
 import { createAdmin, findAdminByEmail, findAdminByMobile, updateAdminLogin, savePasswordResetToken, findAdminByResetToken, updateAdminPassword } from "../repository/admin.repository.js";
 import { hashPassword, hashResetToken, verifyPassword } from "../utils/password.js";
 import createAdminAuditLog from "../utils/createAdminAuditLog.js";
+import { findRetailerById, listRetailers, updateRetailerKyc } from "../repository/adminRetailer.repository.js";
+import User from "../../auth/model/user.model.js";
+import { sendPushNotification } from "../../../utils/notification.js";
+import findAdminAuditLogs from "../repository/adminAudit.repository.js";
 
 const refreshExpiry = () => {
   const expiresIn = env.JWT_REFRESH_EXPIRES_IN || "30d";
@@ -87,4 +91,70 @@ const resetAdminPassword = async ({ token, newPassword, confirmPassword }) => {
   return { message: "Admin password reset successfully" };
 };
 
-export { registerAdmin, loginAdmin, forgotAdminPassword, resetAdminPassword };
+const getRetailers = async (filters = {}) => {
+  const page = Math.max(Number(filters.page) || 1, 1);
+  const limit = Math.min(Math.max(Number(filters.limit) || 20, 1), 100);
+  return listRetailers({ ...filters, page, limit });
+};
+
+const getRetailer = async (id) => {
+  const retailer = await findRetailerById(id);
+  if (!retailer) throw ApiError.notFound("Retailer not found");
+  return { ...retailer, id: retailer._id.toString() };
+};
+
+const updateRetailerKycStatus = async (id, status, reason = "") => {
+  if (!["approved", "rejected"].includes(status)) {
+    throw ApiError.badRequest("Invalid KYC status. Must be 'approved' or 'rejected'.");
+  }
+  if (status === "rejected" && !reason) {
+    throw ApiError.badRequest("Reason is required when rejecting KYC.");
+  }
+
+  const retailer = await User.findById(id);
+  if (!retailer) throw ApiError.notFound("Retailer not found");
+
+  const kycData = {
+    kycStatus: status,
+    kycRejectionReason: status === "rejected" ? reason : "",
+  };
+
+  const updatedRetailer = await updateRetailerKyc(id, kycData);
+
+  const fcmTokens = updatedRetailer.devices
+    .map(device => device.fcmToken)
+    .filter(token => token);
+
+  if (fcmTokens.length > 0) {
+    const title = status === "approved" ? "KYC Approved" : "KYC Rejected";
+    const body = status === "approved"
+      ? "Your KYC documents have been verified successfully. You can now use all features."
+      : `Your KYC documents were rejected. Reason: ${reason}. Please reapply.`;
+    
+    await sendPushNotification(fcmTokens, title, body, { type: "KYC_UPDATE", status });
+  }
+
+  return { id: updatedRetailer._id.toString(), kycStatus: updatedRetailer.kycStatus, kycRejectionReason: updatedRetailer.kycRejectionReason };
+};
+
+const listAdminAuditLogs = async (filters = {}) => {
+  const page = Math.max(Number(filters.page) || 1, 1);
+  const limit = Math.min(Math.max(Number(filters.limit) || 20, 1), 100);
+
+  return findAdminAuditLogs({
+    ...filters,
+    page,
+    limit,
+  });
+};
+
+export {
+  registerAdmin,
+  loginAdmin,
+  forgotAdminPassword,
+  resetAdminPassword,
+  getRetailers,
+  getRetailer,
+  updateRetailerKycStatus,
+  listAdminAuditLogs,
+};

@@ -24,4 +24,6 @@ const listRetailers = async ({ page = 1, limit = 20, search, status, kycStatus }
 
 const findRetailerById = (id) => User.findById(id).select(retailerProjection).lean();
 
-export { listRetailers, findRetailerById };
+const updateRetailerKyc = (id, kycData) => User.findByIdAndUpdate(id, kycData, { new: true });
+
+export { listRetailers, findRetailerById, updateRetailerKyc };
