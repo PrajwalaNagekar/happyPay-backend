@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import onboardMerchant from "../../external/services/onboardMerchant.client.js";
+import onboardMerchant from "../../external/services/provider.service.js";
 import Category from "../../masterdata/model/catagory.model.js";
 import PropertyType from "../../masterdata/model/propertyType.model.js";
 import EducationalQualification from "../../masterdata/model/EducationalQualification.model.js";

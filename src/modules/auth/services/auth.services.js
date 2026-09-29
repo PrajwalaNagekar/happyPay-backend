@@ -6,7 +6,7 @@ import {
   generateRefreshToken,
 } from "../../../utils/jwt.js";
 import { resolveUserAccess } from "../../../utils/rbac.js";
-import { getBankList } from "../../external/services/demographic.client.js";
+import { getBankList } from "../../external/services/provider.service.js";
 
 import {
   findRetailerByEmail,
