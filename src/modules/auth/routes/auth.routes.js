@@ -1,7 +1,8 @@
 import express from "express";
 
 import {
-  loginRetailer,
+  sendRetailerLoginOtp,
+  verifyRetailerLoginOtp,
   logoutRetailer,
   registerRetailer,
 } from "../controllers/auth.controllers.js";
@@ -20,8 +21,13 @@ router.post(
 );
 
 router.post(
-  "/retailer/login",
-  loginRetailer
+  "/retailer/login/send-otp",
+  sendRetailerLoginOtp
+);
+
+router.post(
+  "/retailer/login/verify-otp",
+  verifyRetailerLoginOtp
 );
 
 router.post(

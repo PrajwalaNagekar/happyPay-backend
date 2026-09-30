@@ -1,5 +1,6 @@
 import {
-    retailerLogin,
+    sendRetailerLoginOtp as sendRetailerLoginOtpService,
+    verifyRetailerLoginOtp as verifyRetailerLoginOtpService,
     retailerLogout,
   } from "../services/auth.services.js";
   import { registerRetailer as registerRetailerService } from "../services/registration.service.js";
@@ -48,12 +49,33 @@ import { getBankList } from "../../external/services/provider.service.js";
   };
   
   
-  const loginRetailer = async (
-    req,
-    res
-  ) => {
+  const sendRetailerLoginOtp = async (req, res) => {
     try {
-  
+      const { mobile } = req.body;
+
+      const data = await sendRetailerLoginOtpService({
+        mobile,
+      });
+
+      return res.status(200).json(
+        ApiResponse.success(
+          data,
+          "OTP sent successfully"
+        )
+      );
+    } catch (error) {
+      return res
+        .status(error.statusCode || 500)
+        .json(
+          ApiResponse.error(
+            error.message || "Failed to send OTP"
+          )
+        );
+    }
+  };
+
+  const verifyRetailerLoginOtp = async (req, res) => {
+    try {
       const {
         mobile,
         otp,
@@ -62,9 +84,8 @@ import { getBankList } from "../../external/services/provider.service.js";
         platform,
         deviceName,
       } = req.body;
-  
-  
-      const data = await retailerLogin({
+
+      const data = await verifyRetailerLoginOtpService({
         mobile,
         otp,
         fcmToken,
@@ -72,27 +93,19 @@ import { getBankList } from "../../external/services/provider.service.js";
         platform,
         deviceName,
       });
-  
-  
-      return res
-        .status(200)
-        .json(
-          ApiResponse.success(
-            data,
-            "Login successful"
-          )
-        );
-  
-    } catch (error) {
-  
-      return res
-        .status(
-          error.statusCode || 500
+
+      return res.status(200).json(
+        ApiResponse.success(
+          data,
+          "Login successful"
         )
+      );
+    } catch (error) {
+      return res
+        .status(error.statusCode || 500)
         .json(
           ApiResponse.error(
-            error.message ||
-              "Login failed"
+            error.message || "Login failed"
           )
         );
     }
@@ -245,7 +258,8 @@ import { getBankList } from "../../external/services/provider.service.js";
   
   
   export {
-    loginRetailer,
+    sendRetailerLoginOtp,
+    verifyRetailerLoginOtp,
     logoutRetailer,
     registerRetailer,
     getBankListController,

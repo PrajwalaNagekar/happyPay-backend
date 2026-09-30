@@ -21,6 +21,8 @@ import {
 } from "../repository/auth.repository.js";
 
 import {
+  createOtp,
+  deletePreviousOtps,
   findLatestOtp,
   markOtpVerified,
   incrementAttempts,
@@ -79,11 +81,61 @@ const getRefreshTokenExpiry = () => {
 };
 
 
+const badRequest = (message) => {
+  const error = new Error(message);
+  error.statusCode = 400;
+  throw error;
+};
+
+const generateOtp = () =>
+  Math.floor(100000 + Math.random() * 900000).toString();
+
+const assertRetailerMobile = (mobile) => {
+  if (!mobile) {
+    badRequest("Mobile number is required");
+  }
+
+  if (!/^[0-9]{10}$/.test(String(mobile).trim())) {
+    badRequest("Please enter a valid 10-digit mobile number");
+  }
+};
+
 /* ==============================
-   Retailer Login
+   Retailer Login — Send OTP
 ============================== */
 
-const retailerLogin = async ({
+const sendRetailerLoginOtp = async ({ mobile }) => {
+  assertRetailerMobile(mobile);
+
+  const normalizedMobile = String(mobile).trim();
+  const user = await findRetailerByMobile(normalizedMobile);
+
+  if (!user) {
+    const error = new Error(
+      "Retailer not registered. Please register first."
+    );
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const otp = generateOtp();
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+  await deletePreviousOtps(normalizedMobile);
+  await createOtp(normalizedMobile, otp, expiresAt);
+
+  return {
+    mobile: normalizedMobile,
+    expiresInSeconds: 300,
+  };
+};
+
+
+/* ==============================
+   Retailer Login — Verify OTP
+============================== */
+
+const verifyRetailerLoginOtp = async ({
   mobile,
   otp,
   fcmToken,
@@ -96,24 +148,17 @@ const retailerLogin = async ({
      Validate Input
   ============================== */
 
-  if (!mobile) {
-    const error = new Error(
-      "Mobile number is required"
-    );
+  assertRetailerMobile(mobile);
 
-    error.statusCode = 400;
+  const normalizedMobile = String(mobile).trim();
+  const normalizedOtp = String(otp || "").trim();
 
-    throw error;
+  if (!normalizedOtp) {
+    badRequest("OTP is required");
   }
 
-  if (!otp) {
-    const error = new Error(
-      "OTP is required"
-    );
-
-    error.statusCode = 400;
-
-    throw error;
+  if (!/^[0-9]{6}$/.test(normalizedOtp)) {
+    badRequest("OTP must be 6 digits");
   }
 
   if (!fcmToken) {
@@ -153,7 +198,7 @@ const retailerLogin = async ({
      Find Retailer By Mobile
   ============================== */
 
-  let user = await findRetailerByMobile(mobile);
+  let user = await findRetailerByMobile(normalizedMobile);
 
   if (!user) {
     const error = new Error(
@@ -170,18 +215,39 @@ const retailerLogin = async ({
      Verify OTP
   ============================== */
 
-  // Static OTP verification for now
-  const STATIC_OTP = "123456";
+  const otpRecord = await findLatestOtp(normalizedMobile);
 
-  if (otp.trim() !== STATIC_OTP) {
+  if (!otpRecord) {
     const error = new Error(
-      "Invalid OTP"
+      "OTP not found or already verified"
     );
-
     error.statusCode = 401;
-
     throw error;
   }
+
+  if (otpRecord.expiresAt < new Date()) {
+    const error = new Error("OTP has expired");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  if (otpRecord.attempts >= 5) {
+    const error = new Error(
+      "Maximum OTP attempts exceeded"
+    );
+    error.statusCode = 429;
+    throw error;
+  }
+
+  if (otpRecord.otp !== normalizedOtp) {
+    await incrementAttempts(otpRecord._id);
+
+    const error = new Error("Invalid OTP");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  await markOtpVerified(otpRecord._id);
 
 
   /* ==============================
@@ -366,7 +432,7 @@ const retailerLogout = async ({
 
 
 export {
-  retailerLogin,
+  sendRetailerLoginOtp,
+  verifyRetailerLoginOtp,
   retailerLogout,
-  
 };
