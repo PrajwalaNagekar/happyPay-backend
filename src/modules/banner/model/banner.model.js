@@ -10,7 +10,7 @@ const bannerSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    redirectUrl: {
+    targetUrl: {
       type: String,
     },
     position: {

@@ -60,11 +60,6 @@ const createRetailer = async (data) => {
   });
 };
 
-const findRetailerByMobile = async (mobile) => {
-  return await User.findOne({
-    mobile: mobile.trim(),
-  }).populate(rbacPopulate);
-};
 
 
 /* ==============================
@@ -257,5 +252,4 @@ export {
   deactivateDevice,
   updateKycStatusToPending,
   createRetailer,
-  findRetailerByMobile,
 };
