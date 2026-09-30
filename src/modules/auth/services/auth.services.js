@@ -102,7 +102,6 @@ const retailerLogin = async ({
     );
 
     error.statusCode = 400;
-
     throw error;
   }
 
@@ -241,58 +240,28 @@ const retailerLogin = async ({
   ============================== */
 
   const access = resolveUserAccess(user);
+  const accessToken = generateAccessToken(buildAccessTokenPayload(user, access));
+  const refreshToken = generateRefreshToken(buildRefreshTokenPayload(user));
 
-  const accessToken = generateAccessToken(
-    buildAccessTokenPayload(user, access)
-  );
+  // Save Refresh Token
+  await addRefreshToken(user._id, {
+    token: refreshToken,
+    deviceId: deviceId || "unknown",
+    expiresAt: getRefreshTokenExpiry(),
+    lastUsedAt: new Date(),
+  });
 
-  const refreshToken = generateRefreshToken(
-    buildRefreshTokenPayload(user)
-  );
-
-
-  /* ==============================
-     Save Refresh Token
-  ============================== */
-
-  await addRefreshToken(
-    user._id,
-    {
-      token: refreshToken,
+  // Save Device Info if provided
+  if (deviceId && platform) {
+    await addOrUpdateDevice(user._id, {
       deviceId,
-      expiresAt: getRefreshTokenExpiry(),
-      lastUsedAt: new Date(),
-    }
-  );
-
-
-  /* ==============================
-     Save FCM Device
-  ============================== */
-
-  await addOrUpdateDevice(
-    user._id,
-    {
-      deviceId,
-      fcmToken,
+      fcmToken: fcmToken || "dummy",
       platform,
       deviceName,
-    }
-  );
+    });
+  }
 
-
-  /* ==============================
-     Update Last Login
-  ============================== */
-
-  await updateLastLogin(
-    user._id
-  );
-
-
-  /* ==============================
-     Response
-  ============================== */
+  await updateLastLogin(user._id);
 
   return {
     user: {
@@ -306,12 +275,12 @@ const retailerLogin = async ({
       roles: access.roles,
       permissions: access.permissions,
     },
-
     accessToken,
-
     refreshToken,
   };
 };
+
+
 
 
 /* ==============================
@@ -365,8 +334,189 @@ const retailerLogout = async ({
 
 
 
+
+/* ==============================
+   Reapply For KYC
+============================== */
+
+const reapplyForKyc = async (userId) => {
+  const updatedUser = await updateKycStatusToPending(userId);
+  if (!updatedUser) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
+  }
+  return {
+    kycStatus: updatedUser.kycStatus,
+    kycRejectionReason: updatedUser.kycRejectionReason,
+  };
+};
+
+const retailerRegister = async (data) => {
+  const {
+    mobile,
+    email,
+    fcmToken,
+    deviceId,
+    platform,
+    deviceName,
+  } = data;
+
+  if (!mobile) {
+    const error = new Error("Mobile number is required");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  let user = await findRetailerByMobile(mobile);
+  if (user) {
+    const error = new Error("Retailer with this mobile already exists");
+    error.statusCode = 409;
+    throw error;
+  }
+
+  if (email) {
+    const existingEmail = await findRetailerByEmail(email);
+    if (existingEmail) {
+      const error = new Error("Retailer with this email already exists");
+      error.statusCode = 409;
+      throw error;
+    }
+  }
+
+  // Create new user with all the data
+  user = await createRetailer(data);
+
+  const access = resolveUserAccess(user);
+  const accessToken = generateAccessToken(buildAccessTokenPayload(user, access));
+  const refreshToken = generateRefreshToken(buildRefreshTokenPayload(user));
+
+  await addRefreshToken(user._id, {
+    token: refreshToken,
+    deviceId: deviceId || "unknown",
+    expiresAt: getRefreshTokenExpiry(),
+    lastUsedAt: new Date(),
+  });
+
+  if (deviceId && fcmToken && platform) {
+    await addOrUpdateDevice(user._id, {
+      deviceId,
+      fcmToken,
+      platform,
+      deviceName,
+    });
+  }
+
+  await updateLastLogin(user._id);
+
+  return {
+    user: {
+      id: user._id,
+      email: user.email,
+      mobile: user.mobile,
+      status: user.status,
+      kycStatus: user.kycStatus,
+      roles: access.roles,
+      permissions: access.permissions,
+    },
+    accessToken,
+    refreshToken,
+  };
+};
+
+
+/* ==============================
+   Reapply For KYC
+============================== */
+
+const reapplyForKyc = async (userId) => {
+  const updatedUser = await updateKycStatusToPending(userId);
+  if (!updatedUser) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
+  }
+  return {
+    kycStatus: updatedUser.kycStatus,
+    kycRejectionReason: updatedUser.kycRejectionReason,
+  };
+};
+
+const retailerRegister = async (data) => {
+  const {
+    mobile,
+    email,
+    fcmToken,
+    deviceId,
+    platform,
+    deviceName,
+  } = data;
+
+  if (!mobile) {
+    const error = new Error("Mobile number is required");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  let user = await findRetailerByMobile(mobile);
+  if (user) {
+    const error = new Error("Retailer with this mobile already exists");
+    error.statusCode = 409;
+    throw error;
+  }
+
+  if (email) {
+    const existingEmail = await findRetailerByEmail(email);
+    if (existingEmail) {
+      const error = new Error("Retailer with this email already exists");
+      error.statusCode = 409;
+      throw error;
+    }
+  }
+
+  // Create new user with all the data
+  user = await createRetailer(data);
+
+  const access = resolveUserAccess(user);
+  const accessToken = generateAccessToken(buildAccessTokenPayload(user, access));
+  const refreshToken = generateRefreshToken(buildRefreshTokenPayload(user));
+
+  await addRefreshToken(user._id, {
+    token: refreshToken,
+    deviceId: deviceId || "unknown",
+    expiresAt: getRefreshTokenExpiry(),
+    lastUsedAt: new Date(),
+  });
+
+  if (deviceId && fcmToken && platform) {
+    await addOrUpdateDevice(user._id, {
+      deviceId,
+      fcmToken,
+      platform,
+      deviceName,
+    });
+  }
+
+  await updateLastLogin(user._id);
+
+  return {
+    user: {
+      id: user._id,
+      email: user.email,
+      mobile: user.mobile,
+      status: user.status,
+      kycStatus: user.kycStatus,
+      roles: access.roles,
+      permissions: access.permissions,
+    },
+    accessToken,
+    refreshToken,
+  };
+};
 export {
   retailerLogin,
   retailerLogout,
   
+  reapplyForKyc,
+  retailerRegister,
 };

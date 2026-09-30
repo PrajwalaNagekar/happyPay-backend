@@ -1,8 +1,9 @@
 import {
     retailerLogin,
     retailerLogout,
-  } from "../services/auth.services.js";
-  import { registerRetailer as registerRetailerService } from "../services/registration.service.js";
+    retailerRegister,
+    reapplyForKyc,
+  } from "../services/auth.services.js"; 
 
   import ApiResponse from "../../../utils/ApiResponse.js";
   import cloudinary from "../../../config/cloudinary.js";
@@ -150,7 +151,7 @@ import { getBankList } from "../../external/services/provider.service.js";
         ])
       );
   
-      const data = await registerRetailerService({
+      const data = await retailerRegister({
         ...req.body,
         ...documents,
       });
@@ -242,11 +243,41 @@ import { getBankList } from "../../external/services/provider.service.js";
       );
     }
   };
-  
-  
+
+  const kycReapply = async (
+    req,
+    res
+  ) => {
+    try {
+      const data = await reapplyForKyc(req.user.userId);
+      return res
+        .status(200)
+        .json(
+          ApiResponse.success(
+            data,
+            "KYC reapplied successfully"
+          )
+        );
+    } catch (error) {
+      return res
+        .status(
+          error.statusCode || 500
+        )
+        .json(
+          ApiResponse.error(
+            error.message ||
+              "KYC reapply failed"
+          )
+        );
+    }
+  };
+
+
+
   export {
     loginRetailer,
     logoutRetailer,
     registerRetailer,
     getBankListController,
+    kycReapply,
   };

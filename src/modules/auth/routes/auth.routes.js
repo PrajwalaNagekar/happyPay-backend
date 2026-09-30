@@ -4,10 +4,12 @@ import {
   loginRetailer,
   logoutRetailer,
   registerRetailer,
+  getBankListController,
+  kycReapply,
 } from "../controllers/auth.controllers.js";
 import { uploadRetailerDocuments } from "../../../utils/multer.js";
-import { getBankListController } from "../controllers/auth.controllers.js";
 import { validateRegisterRetailer } from "../validations/retailer.validation.js";
+import authMiddleware from "../../../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -31,8 +33,13 @@ router.post(
 
 router.get(
   "/banks",
-  
   getBankListController
+);
+
+router.post(
+  "/retailer/kyc/reapply",
+  authMiddleware,
+  kycReapply
 );
 
 export default router;
