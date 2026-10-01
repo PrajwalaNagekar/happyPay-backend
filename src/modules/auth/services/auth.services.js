@@ -19,6 +19,7 @@ import {
   findUserByRefreshToken,
   removeRefreshToken,
   deactivateDevice,
+  updateKycStatusToPending,
 } from "../repository/auth.repository.js";
 
 import {
@@ -452,4 +453,6 @@ export {
   sendRetailerLoginOtp,
   verifyRetailerLoginOtp,
   retailerLogout,
+  retailerRegister,
+  reapplyForKyc,
 };

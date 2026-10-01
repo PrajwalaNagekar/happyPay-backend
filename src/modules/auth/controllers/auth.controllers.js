@@ -114,10 +114,8 @@ import { getBankList } from "../../external/services/provider.service.js";
   };
   
   
-  const logoutRetailer = async (
-    req,
-    res
-  ) => {
+  const logoutRetailer = async (req, res) => {
+    try {
       const {
         refreshToken,
         deviceId,
@@ -136,9 +134,18 @@ import { getBankList } from "../../external/services/provider.service.js";
             "Logout successful"
           )
         );
-  });
+    } catch (error) {
+      return res
+        .status(error.statusCode || 500)
+        .json(
+          ApiResponse.error(
+            error.message || "Logout failed"
+          )
+        );
+    }
+  };
 
-  export const registerRetailer = asyncHandler(async (req, res) => {
+  const registerRetailer = asyncHandler(async (req, res) => {
     const files = uploadedRetailerFiles(req.files);
   
     try {
@@ -166,7 +173,8 @@ import { getBankList } from "../../external/services/provider.service.js";
     }
   });
 
-  export const getBankListController = asyncHandler(async (req, res) => {
+  const getBankListController = asyncHandler(async (req, res) => {
+    try {
       const page = Math.max(
         Number(req.query.page) || 1,
         1
@@ -220,13 +228,25 @@ import { getBankList } from "../../external/services/provider.service.js";
         )
       );
     }
-  };
+  });
   
   
+  const kycReapply = asyncHandler(async (req, res) => {
+    const data = await reapplyForKyc(req.user.userId);
+
+    return res.status(200).json(
+      ApiResponse.success(
+        data,
+        "KYC reapply submitted successfully"
+      )
+    );
+  });
+
   export {
     sendRetailerLoginOtp,
     verifyRetailerLoginOtp,
     logoutRetailer,
     registerRetailer,
     getBankListController,
+    kycReapply,
   };
