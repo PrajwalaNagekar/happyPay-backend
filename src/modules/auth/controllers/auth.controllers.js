@@ -1,9 +1,11 @@
+import { asyncHandler } from '../../../utils/asyncHandler.js';
 import {
     sendRetailerLoginOtp as sendRetailerLoginOtpService,
     verifyRetailerLoginOtp as verifyRetailerLoginOtpService,
     retailerLogout,
-  } from "../services/auth.services.js";
-  import { registerRetailer as registerRetailerService } from "../services/registration.service.js";
+    retailerRegister,
+    reapplyForKyc,
+  } from "../services/auth.services.js"; 
 
   import ApiResponse from "../../../utils/ApiResponse.js";
   import cloudinary from "../../../config/cloudinary.js";
@@ -116,8 +118,6 @@ import { getBankList } from "../../external/services/provider.service.js";
     req,
     res
   ) => {
-    try {
-
       const {
         refreshToken,
         deviceId,
@@ -136,23 +136,9 @@ import { getBankList } from "../../external/services/provider.service.js";
             "Logout successful"
           )
         );
+  });
 
-    } catch (error) {
-
-      return res
-        .status(
-          error.statusCode || 500
-        )
-        .json(
-          ApiResponse.error(
-            error.message ||
-              "Logout failed"
-          )
-        );
-    }
-  };
-
-  const registerRetailer = async (req, res) => {
+  export const registerRetailer = asyncHandler(async (req, res) => {
     const files = uploadedRetailerFiles(req.files);
   
     try {
@@ -163,7 +149,7 @@ import { getBankList } from "../../external/services/provider.service.js";
         ])
       );
   
-      const data = await registerRetailerService({
+      const data = await retailerRegister({
         ...req.body,
         ...documents,
       });
@@ -176,31 +162,11 @@ import { getBankList } from "../../external/services/provider.service.js";
       );
     } catch (error) {
       await removeUploadedRetailerFiles(files);
-  
-      // Validation / business error
-      if (error.statusCode) {
-        return res.status(error.statusCode).json(
-          ApiResponse.error(
-            error.message,
-            null,
-            error.meta || null
-          )
-        );
-      }
-  
-      // Unexpected server error
-      console.error("Register retailer error:", error);
-  
-      return res.status(500).json(
-        ApiResponse.error(
-          "Something went wrong while registering retailer"
-        )
-      );
+      throw error;
     }
-  };
+  });
 
-  const getBankListController = async (req, res) => {
-    try {
+  export const getBankListController = asyncHandler(async (req, res) => {
       const page = Math.max(
         Number(req.query.page) || 1,
         1

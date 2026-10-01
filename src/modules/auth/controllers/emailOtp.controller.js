@@ -1,3 +1,4 @@
+import { asyncHandler } from '../../../utils/asyncHandler.js';
 import {
   sendEmailOtp,
   verifyEmailOtp,
@@ -5,9 +6,8 @@ import {
 
 import { ApiResponse } from "../../../utils/ApiResponse.js";
 
-const sendOtp = async (req, res) => {
-  try {
-    const data = await sendEmailOtp(req.body.email);
+export const sendOtp = asyncHandler(async (req, res) => {
+  const data = await sendEmailOtp(req.body.email);
 
     return res.status(200).json(
       ApiResponse.success(
@@ -15,18 +15,10 @@ const sendOtp = async (req, res) => {
         "OTP sent successfully"
       )
     );
-  } catch (error) {
-    return res.status(error.statusCode || 500).json(
-      ApiResponse.error(
-        error.message || "Something went wrong"
-      )
-    );
-  }
-};
+});
 
-const verifyOtp = async (req, res) => {
-  try {
-    const data = await verifyEmailOtp(
+export const verifyOtp = asyncHandler(async (req, res) => {
+  const data = await verifyEmailOtp(
       req.body.email,
       req.body.otp,
       req.body.mobile
@@ -38,16 +30,5 @@ const verifyOtp = async (req, res) => {
         "Email verified successfully"
       )
     );
-  } catch (error) {
-    return res.status(error.statusCode || 500).json(
-      ApiResponse.error(
-        error.message || "Something went wrong"
-      )
-    );
-  }
-};
+});
 
-export {
-  sendOtp,
-  verifyOtp,
-};

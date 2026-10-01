@@ -4,7 +4,7 @@ dotenv.config();
 import mongoose from "mongoose";
 
 import Admin from "../modules/auth/model/Admin.model.js";
-import Role from "../modules/auth/model/Role.model.js";
+import Role from "../modules/auth/model/role.model.js";
 import { createAdminService } from "../modules/auth/services/admin.services.js";
 
 

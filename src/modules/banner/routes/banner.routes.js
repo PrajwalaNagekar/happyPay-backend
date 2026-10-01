@@ -1,0 +1,23 @@
+import { Router } from "express";
+import {
+  createBannerController,
+  getBannersController,
+  getBannerByIdController,
+  updateBannerController,
+  deleteBannerController,
+} from "../controllers/banner.controller.js";
+import authMiddleware from "../../../middlewares/auth.middleware.js";
+import requireAdmin from "../../../middlewares/admin.middleware.js";
+
+const router = Router();
+
+// Public / Retailer route to get active banners
+router.get("/", getBannersController);
+router.get("/:id", getBannerByIdController);
+
+// Admin only routes for CRUD
+router.post("/", authMiddleware, requireAdmin, createBannerController);
+router.put("/:id", authMiddleware, requireAdmin, updateBannerController);
+router.delete("/:id", authMiddleware, requireAdmin, deleteBannerController);
+
+export default router;

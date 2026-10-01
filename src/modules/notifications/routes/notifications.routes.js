@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 
 import {
   sendKycApprovedNotificationController,
@@ -7,7 +7,7 @@ import {
 
 import { verifyToken } from "../../../middlewares/auth.middleware.js";
 
-const router = express.Router();
+const router = Router();
 
 router.post(
   "/kyc-approved",

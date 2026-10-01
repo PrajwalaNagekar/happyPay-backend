@@ -90,26 +90,10 @@ export const registerRetailerSchema = Joi.object({
       "string.pattern.base": "Please enter a valid 12-digit Aadhaar number",
     }),
 
-  fulladdress: Joi.string().trim().required().messages({
-    "any.required": "fulladdress is required",
-    "string.empty": "fulladdress is required",
-  }),
-
-  pincode: Joi.string()
-    .trim()
-    .pattern(/^\d{6}$/)
-    .required()
-    .messages({
-      "any.required": "pincode is required",
-      "string.empty": "pincode is required",
-      "string.pattern.base": "Please enter a valid 6-digit pincode",
-    }),
-
-  city: Joi.string().trim().required().messages({
-    "any.required": "city is required",
-    "string.empty": "city is required",
-  }),
-
+  fulladdress: Joi.string().trim().optional(),
+  pincode: Joi.string().trim().pattern(/^\d{6}$/).optional(),
+  city: Joi.string().trim().optional(),
+  
   dob: Joi.string()
     .trim()
     .required()
@@ -128,28 +112,9 @@ export const registerRetailerSchema = Joi.object({
       "date.invalid": "Please enter a valid date of birth",
     }),
 
-  latitude: Joi.number()
-    .min(-90)
-    .max(90)
-    .required()
-    .messages({
-      "any.required": "latitude is required",
-      "number.base": "Please enter a valid latitude",
-      "number.min": "Please enter a valid latitude",
-      "number.max": "Please enter a valid latitude",
-    }),
-
-  longitude: Joi.number()
-    .min(-180)
-    .max(180)
-    .required()
-    .messages({
-      "any.required": "longitude is required",
-      "number.base": "Please enter a valid longitude",
-      "number.min": "Please enter a valid longitude",
-      "number.max": "Please enter a valid longitude",
-    }),
-
+  latitude: Joi.number().min(-90).max(90).optional(),
+  longitude: Joi.number().min(-180).max(180).optional(),
+  
   shopName: Joi.string().trim().required().messages({
     "any.required": "shopName is required",
     "string.empty": "shopName is required",
@@ -171,10 +136,7 @@ export const registerRetailerSchema = Joi.object({
 
   educationalQualification: objectId("educational qualification"),
 
-  fatherName: Joi.string().trim().required().messages({
-    "any.required": "fatherName is required",
-    "string.empty": "fatherName is required",
-  }),
+  fatherName: Joi.string().trim().optional(),
 
   businessProof: objectId("business proof"),
 
@@ -197,10 +159,15 @@ export const registerRetailerSchema = Joi.object({
   selfie: uploadedFile("selfie"),
   panDocument: uploadedFile("panDocument"),
   aadhaarDocument: uploadedFile("aadhaarDocument"),
-  shopInsidePhoto: uploadedFile("shopInsidePhoto"),
-  shopOutsidePhoto: uploadedFile("shopOutsidePhoto"),
-  shopLocationPhoto: uploadedFile("shopLocationPhoto"),
+  shopInsidePhoto: Joi.string().trim().allow("").optional(),
+  shopOutsidePhoto: Joi.string().trim().allow("").optional(),
+  shopLocationPhoto: Joi.string().trim().allow("").optional(),
   businessProofDocument: uploadedFile("businessProofDocument"),
+
+  fcmToken: Joi.string().trim().optional(),
+  deviceId: Joi.string().trim().optional(),
+  platform: Joi.string().trim().valid("android", "ios", "web").optional(),
+  deviceName: Joi.string().trim().optional(),
 });
 
 const buildRegisterRetailerPayload = (body = {}, files = {}) => ({
