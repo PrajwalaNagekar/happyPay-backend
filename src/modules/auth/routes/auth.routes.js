@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 
 import {
   loginRetailer,
@@ -11,7 +11,7 @@ import { uploadRetailerDocuments } from "../../../utils/multer.js";
 import { validateRegisterRetailer } from "../validations/retailer.validation.js";
 import authMiddleware from "../../../middlewares/auth.middleware.js";
 
-const router = express.Router();
+const router = Router();
 
 
 router.post(

@@ -6,7 +6,8 @@ import {
   updateBannerController,
   deleteBannerController,
 } from "../controllers/banner.controller.js";
-// import { verifyToken, isAdmin } from "../../../middlewares/auth.js"; // Assume these middlewares exist for protecting routes
+import authMiddleware from "../../../middlewares/auth.middleware.js";
+import requireAdmin from "../../../middlewares/admin.middleware.js";
 
 const router = Router();
 
@@ -15,9 +16,8 @@ router.get("/", getBannersController);
 router.get("/:id", getBannerByIdController);
 
 // Admin only routes for CRUD
-// If you have auth middlewares, add them here: router.post("/", verifyToken, isAdmin, createBannerController);
-router.post("/", createBannerController);
-router.put("/:id", updateBannerController);
-router.delete("/:id", deleteBannerController);
+router.post("/", authMiddleware, requireAdmin, createBannerController);
+router.put("/:id", authMiddleware, requireAdmin, updateBannerController);
+router.delete("/:id", authMiddleware, requireAdmin, deleteBannerController);
 
 export default router;

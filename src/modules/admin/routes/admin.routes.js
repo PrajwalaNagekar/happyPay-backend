@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import authMiddleware from "../../../middlewares/auth.middleware.js";
 import requireAdmin from "../../../middlewares/admin.middleware.js";
 import {
@@ -12,7 +12,7 @@ import {
   getAuditLogs,
 } from "../controllers/admin.controller.js";
 
-const router = express.Router();
+const router = Router();
 
 // Auth routes (unprotected or self-protected)
 router.post("/auth/register", register);

@@ -1,3 +1,4 @@
+import { asyncHandler } from '../../../utils/asyncHandler.js';
 import {
   createAdminService,
   loginAdminService,
@@ -7,9 +8,8 @@ import {
 } from "../services/admin.services.js";
 import ApiResponse from "../../../utils/ApiResponse.js";
 
-const createAdminController = async (req, res) => {
-  try {
-    const admin = await createAdminService(req.body);
+export const createAdminController = asyncHandler(async (req, res) => {
+  const admin = await createAdminService(req.body);
 
     return res.status(201).json({
       success: true,
@@ -24,19 +24,10 @@ const createAdminController = async (req, res) => {
         status: admin.status,
       },
     });
-  } catch (error) {
-    console.log("Create admin error:", error);
+});
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-const loginAdmin = async (req, res) => {
-  try {
-    const { email, mobile, password } = req.body;
+export const loginAdmin = asyncHandler(async (req, res) => {
+  const { email, mobile, password } = req.body;
 
     const data = await loginAdminService({
       email,
@@ -47,16 +38,10 @@ const loginAdmin = async (req, res) => {
     return res
       .status(200)
       .json(ApiResponse.success(data, "Login successful"));
-  } catch (error) {
-    return res
-      .status(error.statusCode || 500)
-      .json(ApiResponse.error(error.message || "Login failed"));
-  }
-};
+});
 
-const getPendingRetailers = async (req, res) => {
-  try {
-    const page = Math.max(
+export const getPendingRetailers = asyncHandler(async (req, res) => {
+  const page = Math.max(
       Number(req.query.page) || 1,
       1
     );
@@ -80,40 +65,18 @@ const getPendingRetailers = async (req, res) => {
           result.meta
         )
       );
-  } catch (error) {
-    console.error(
-      "Get pending retailers error:",
-      error
-    );
+});
 
-    return res
-      .status(error.statusCode || 500)
-      .json(
-        ApiResponse.error(
-          error.message ||
-            "Failed to fetch pending retailers"
-        )
-      );
-  }
-};
-
-const approveRetailer = async (req, res) => {
-  try {
-    const data = await approveRetailerService(req.params.retailerId);
+export const approveRetailer = asyncHandler(async (req, res) => {
+  const data = await approveRetailerService(req.params.retailerId);
 
     return res
       .status(200)
       .json(ApiResponse.success(data, "Retailer approved successfully"));
-  } catch (error) {
-    return res
-      .status(error.statusCode || 500)
-      .json(ApiResponse.error(error.message || "Retailer approval failed"));
-  }
-};
+});
 
-const rejectRetailer = async (req, res) => {
-  try {
-    const data = await rejectRetailerService(
+export const rejectRetailer = asyncHandler(async (req, res) => {
+  const data = await rejectRetailerService(
       req.params.retailerId,
       req.body.reasonOfRejection
     );
@@ -121,17 +84,5 @@ const rejectRetailer = async (req, res) => {
     return res
       .status(200)
       .json(ApiResponse.success(data, "Retailer rejected successfully"));
-  } catch (error) {
-    return res
-      .status(error.statusCode || 500)
-      .json(ApiResponse.error(error.message || "Retailer rejection failed"));
-  }
-};
+});
 
-export {
-  createAdminController,
-  loginAdmin,
-  getPendingRetailers,
-  approveRetailer,
-  rejectRetailer,
-};

@@ -1,4 +1,4 @@
-import AdminAuditLog from "../models/adminAuditLog.model.js";
+import AdminAuditLog from "../model/adminAuditLog.model.js";
 
 const findAdminAuditLogs = async ({ page = 1, limit = 20, search, action, adminId, fromDate, toDate }) => {
   const query = {};

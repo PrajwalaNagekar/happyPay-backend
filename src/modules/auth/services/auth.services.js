@@ -12,6 +12,7 @@ import {
   findRetailerByEmail,
   findRetailerByMobile,
   createTestRetailer,
+  createRetailer,
   updateLastLogin,
   addRefreshToken,
   addOrUpdateDevice,
@@ -115,37 +116,7 @@ const retailerLogin = async ({
     throw error;
   }
 
-  if (!fcmToken) {
-    const error = new Error(
-      "FCM token is required"
-    );
 
-    error.statusCode = 400;
-
-    throw error;
-  }
-
-  if (!deviceId) {
-    const error = new Error(
-      "Device ID is required"
-    );
-
-    error.statusCode = 400;
-
-    throw error;
-  }
-
-  if (
-    !["android", "ios", "web"].includes(platform)
-  ) {
-    const error = new Error(
-      "Invalid platform"
-    );
-
-    error.statusCode = 400;
-
-    throw error;
-  }
 
 
   /* ==============================
@@ -218,21 +189,7 @@ const retailerLogin = async ({
   }
 
 
-  /* ==============================
-     Check Admin KYC Approval
-  ============================== */
 
-  if (user.adminApproved !== "approved") {
-    const error = new Error(
-      user.adminApproved === "rejected"
-        ? `Your KYC has been rejected. Reason: ${user.reasonOfRejection || "Not specified"}`
-        : "Your KYC is pending admin approval"
-    );
-
-    error.statusCode = 403;
-
-    throw error;
-  }
 
 
   /* ==============================

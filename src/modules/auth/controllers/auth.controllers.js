@@ -1,3 +1,4 @@
+import { asyncHandler } from '../../../utils/asyncHandler.js';
 import {
     retailerLogin,
     retailerLogout,
@@ -49,12 +50,10 @@ import { getBankList } from "../../external/services/provider.service.js";
   };
   
   
-  const loginRetailer = async (
+  export const loginRetailer = asyncHandler(async (
     req,
     res
   ) => {
-    try {
-  
       const {
         mobile,
         otp,
@@ -63,7 +62,6 @@ import { getBankList } from "../../external/services/provider.service.js";
         platform,
         deviceName,
       } = req.body;
-  
   
       const data = await retailerLogin({
         mobile,
@@ -74,7 +72,6 @@ import { getBankList } from "../../external/services/provider.service.js";
         deviceName,
       });
   
-  
       return res
         .status(200)
         .json(
@@ -83,29 +80,13 @@ import { getBankList } from "../../external/services/provider.service.js";
             "Login successful"
           )
         );
-  
-    } catch (error) {
-  
-      return res
-        .status(
-          error.statusCode || 500
-        )
-        .json(
-          ApiResponse.error(
-            error.message ||
-              "Login failed"
-          )
-        );
-    }
-  };
+  });
   
   
-  const logoutRetailer = async (
+  export const logoutRetailer = asyncHandler(async (
     req,
     res
   ) => {
-    try {
-
       const {
         refreshToken,
         deviceId,
@@ -124,23 +105,9 @@ import { getBankList } from "../../external/services/provider.service.js";
             "Logout successful"
           )
         );
+  });
 
-    } catch (error) {
-
-      return res
-        .status(
-          error.statusCode || 500
-        )
-        .json(
-          ApiResponse.error(
-            error.message ||
-              "Logout failed"
-          )
-        );
-    }
-  };
-
-  const registerRetailer = async (req, res) => {
+  export const registerRetailer = asyncHandler(async (req, res) => {
     const files = uploadedRetailerFiles(req.files);
   
     try {
@@ -164,31 +131,11 @@ import { getBankList } from "../../external/services/provider.service.js";
       );
     } catch (error) {
       await removeUploadedRetailerFiles(files);
-  
-      // Validation / business error
-      if (error.statusCode) {
-        return res.status(error.statusCode).json(
-          ApiResponse.error(
-            error.message,
-            null,
-            error.meta || null
-          )
-        );
-      }
-  
-      // Unexpected server error
-      console.error("Register retailer error:", error);
-  
-      return res.status(500).json(
-        ApiResponse.error(
-          "Something went wrong while registering retailer"
-        )
-      );
+      throw error;
     }
-  };
+  });
 
-  const getBankListController = async (req, res) => {
-    try {
+  export const getBankListController = asyncHandler(async (req, res) => {
       const page = Math.max(
         Number(req.query.page) || 1,
         1
@@ -211,44 +158,12 @@ import { getBankList } from "../../external/services/provider.service.js";
           result.meta
         )
       );
-    } catch (error) {
-      console.error(
-        "Bank list fetching error:",
-        error.message
-      );
-  
-      console.error(
-        "Provider response:",
-        error.response?.data
-      );
-  
-      const providerStatus = error.response?.status;
-  
-      const statusCode =
-        providerStatus >= 400 &&
-        providerStatus < 500
-          ? providerStatus
-          : 502;
-  
-      const message =
-        error.response?.data?.msg ||
-        error.response?.data?.message ||
-        "Failed to fetch bank list";
-  
-      return res.status(statusCode).json(
-        ApiResponse.error(
-          message,
-          error.response?.data || null
-        )
-      );
-    }
-  };
+  });
 
-  const kycReapply = async (
+  export const kycReapply = asyncHandler(async (
     req,
     res
   ) => {
-    try {
       const data = await reapplyForKyc(req.user.userId);
       return res
         .status(200)
@@ -258,26 +173,7 @@ import { getBankList } from "../../external/services/provider.service.js";
             "KYC reapplied successfully"
           )
         );
-    } catch (error) {
-      return res
-        .status(
-          error.statusCode || 500
-        )
-        .json(
-          ApiResponse.error(
-            error.message ||
-              "KYC reapply failed"
-          )
-        );
-    }
-  };
+  });
 
 
-
-  export {
-    loginRetailer,
-    logoutRetailer,
-    registerRetailer,
-    getBankListController,
-    kycReapply,
-  };
+

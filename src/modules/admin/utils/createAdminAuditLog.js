@@ -1,4 +1,4 @@
-import AdminAuditLog from "../models/adminAuditLog.model.js";
+import AdminAuditLog from "../model/adminAuditLog.model.js";
 
 const createAdminAuditLog = async ({
   action,

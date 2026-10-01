@@ -9,6 +9,7 @@ import createAdminAuditLog from "../utils/createAdminAuditLog.js";
 import { findRetailerById, listRetailers, updateRetailerKyc } from "../repository/adminRetailer.repository.js";
 import User from "../../auth/model/user.model.js";
 import { sendPushNotification } from "../../../utils/notification.js";
+import bcrypt from "bcrypt";
 import findAdminAuditLogs from "../repository/adminAudit.repository.js";
 
 const refreshExpiry = () => {
@@ -35,12 +36,18 @@ const registerAdmin = async ({ name, email, mobile, password, confirmPassword },
   return publicAdmin(admin);
 };
 
-const loginAdmin = async ({ email, mobile, password }, req) => {
-  if ((!email?.trim() && !mobile?.trim()) || !password) throw ApiError.badRequest("Email or mobile and password are required");
-  if (email?.trim() && mobile?.trim()) throw ApiError.badRequest("Provide either email or mobile, not both");
-  const admin = email?.trim() ? await findAdminByEmail(email) : await findAdminByMobile(mobile);
-  if (!admin || !(await verifyPassword(password, admin.passwordHash))) throw ApiError.unauthorized("Invalid admin credentials");
-  if (!admin.isActive || admin.status !== "active") throw ApiError.forbidden("Admin account is inactive or suspended");
+const loginAdmin = async ({ email, password }, req) => {
+  if (!email?.trim() || !password) throw ApiError.badRequest("Email and password are required");
+  const admin = await findAdminByEmail(email.trim());
+  console.log("Admin found:", !!admin, "Password hash exists:", !!admin?.password);
+  
+  if (!admin) throw ApiError.unauthorized("Invalid admin credentials (not found)");
+  
+  const isPasswordValid = await bcrypt.compare(password, admin.password);
+  console.log("Is password valid:", isPasswordValid);
+  
+  if (!isPasswordValid) throw ApiError.unauthorized("Invalid admin credentials (wrong password)");
+  if (admin.status !== "active") throw ApiError.forbidden("Admin account is inactive or suspended");
 
   const accessToken = generateAccessToken({ adminId: admin._id.toString(), email: admin.email, userType: "admin", role: admin.role });
   const refreshToken = generateRefreshToken({ adminId: admin._id.toString(), userType: "admin" });

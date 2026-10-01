@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 
 import PropertyType from "../model/propertyType.model.js";
 import ProofType from "../model/ProofType.model.js";
@@ -13,7 +13,7 @@ import {
   remove,
 } from "../controllers/masterData.controller.js";
 
-const router = express.Router();
+const router = Router();
 
 /* =========================
    Property Types

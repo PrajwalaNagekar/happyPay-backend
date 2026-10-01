@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import {
   loginAdmin,
   getPendingRetailers,
@@ -7,7 +7,7 @@ import {
 } from "../controllers/admin.controller.js";
 import authMiddleware, { requireAdmin } from "../../../middlewares/auth.middleware.js";
 
-const router = express.Router();
+const router = Router();
 
 router.post("/login", loginAdmin);
 

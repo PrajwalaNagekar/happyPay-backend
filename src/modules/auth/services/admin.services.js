@@ -58,22 +58,15 @@ const createAdminService = async ({
 
 const loginAdminService = async ({
   email,
-  mobile,
   password,
 }) => {
-  if ((!email?.trim() && !mobile?.trim()) || !password) {
-    const error = new Error("Email or mobile and password are required");
+  if (!email?.trim() || !password) {
+    const error = new Error("Email and password are required");
     error.statusCode = 400;
     throw error;
   }
 
-  if (email?.trim() && mobile?.trim()) {
-    const error = new Error("Enter either email or mobile, not both");
-    error.statusCode = 400;
-    throw error;
-  }
-
-  const admin = await findAdminForLogin({ email, mobile });
+  const admin = await findAdminForLogin({ email });
 
   if (!admin) {
     const error = new Error("Invalid credentials");
