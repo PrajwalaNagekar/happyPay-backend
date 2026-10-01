@@ -6,7 +6,6 @@ import {
   logoutRetailer,
   registerRetailer,
   getBankListController,
-  kycReapply,
 } from "../controllers/auth.controllers.js";
 import { uploadRetailerDocuments } from "../../../utils/multer.js";
 import { validateRegisterRetailer } from "../validations/retailer.validation.js";
@@ -42,10 +41,6 @@ router.get(
   getBankListController
 );
 
-router.post(
-  "/retailer/kyc/reapply",
-  authMiddleware,
-  kycReapply
-);
+
 
 export default router;

@@ -409,8 +409,22 @@ const retailerRegister = async (data) => {
     }
   }
 
+  // Map flat validation fields to Mongoose schema structure
+  const mappedData = {
+    ...data,
+    aadhaarNumber: data.aadhaar,
+    dateOfBirth: data.dob,
+    businessProofType: data.businessProof,
+    bank: {
+      name: data.bankName,
+      ifscCode: data.ifscCode,
+      accountNumber: data.accountNumber,
+      confirmAccountNumber: data.confirmAccountNumber,
+    }
+  };
+
   // Create new user with all the data
-  user = await createRetailer(data);
+  user = await createRetailer(mappedData);
 
   const access = resolveUserAccess(user);
   const accessToken = generateAccessToken(buildAccessTokenPayload(user, access));

@@ -156,6 +156,21 @@ export const registerRetailerSchema = Joi.object({
       "string.pattern.base": "Please enter a valid IFSC code",
     }),
 
+  accountNumber: Joi.string()
+    .trim()
+    .pattern(/^\d{9,18}$/)
+    .required()
+    .messages({
+      "any.required": "accountNumber is required",
+      "string.empty": "accountNumber is required",
+      "string.pattern.base": "Please enter a valid account number",
+    }),
+
+  confirmAccountNumber: Joi.any().valid(Joi.ref("accountNumber")).required().messages({
+    "any.only": "Account numbers do not match",
+    "any.required": "confirmAccountNumber is required",
+  }),
+
   selfie: uploadedFile("selfie"),
   panDocument: uploadedFile("panDocument"),
   aadhaarDocument: uploadedFile("aadhaarDocument"),
